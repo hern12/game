@@ -23,16 +23,16 @@ const colors = {
   2048: purple.A700,
 };
 
-export interface QuadrelProps {
+export interface TileProps {
   className?: string;
 }
 
-type QuadrelPropsWithStore = QuadrelProps & WithTileStore;
+type TilePropsWithStore = TileProps & WithTileStore;
 
 @inject('tileStore')
 @observer
-class Quadrel extends React.Component<QuadrelPropsWithStore> {
-  constructor(props: QuadrelPropsWithStore) {
+class Tile extends React.Component<TilePropsWithStore> {
+  constructor(props: TilePropsWithStore) {
     super(props);
   }
 
@@ -82,4 +82,4 @@ class Quadrel extends React.Component<QuadrelPropsWithStore> {
   }
 }
 
-export default Quadrel as React.ComponentClass<QuadrelProps>;
+export default Tile as React.ComponentClass<TileProps>;

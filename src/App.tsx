@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { configure } from 'mobx';
-import { MuiThemeProvider } from 'material-ui/styles';
+import CssBaseline from 'material-ui/CssBaseline';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
+import { MuiThemeProvider } from 'material-ui/styles';
 import createAppTheme from './theme';
-import CssBaseline from 'material-ui/CssBaseline';
 import Game2048 from './components/Game2048';
 import GameTetris from './components/GameTetris';
 
