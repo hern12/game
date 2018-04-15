@@ -1,0 +1,30 @@
+{
+  "name": "game",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "classnames": "^2.2.5",
+    "immutable": "^3.8.2",
+    "material-ui": "^1.0.0-beta.41",
+    "material-ui-icons": "^1.0.0-beta.36",
+    "mobx": "^4.1.1",
+    "mobx-react": "^5.0.0",
+    "react": "^16.3.1",
+    "react-dom": "^16.3.1",
+    "react-scripts-ts": "2.14.0"
+  },
+  "scripts": {
+    "start": "react-scripts-ts start",
+    "build": "react-scripts-ts build",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject"
+  },
+  "devDependencies": {
+    "@types/classnames": "^2.2.3",
+    "@types/jest": "^22.2.2",
+    "@types/node": "^9.6.2",
+    "@types/react": "^16.3.10",
+    "@types/react-dom": "^16.0.5",
+    "typescript": "^2.8.1"
+  }
+}
