@@ -44,8 +44,8 @@ class Control extends React.Component<ControlPropsWithStore> {
     document.removeEventListener('keydown', this.handleKeydown);
     document.removeEventListener('keyup', this.handleKeyup);
     window.clearInterval(this.downTimer);
-    window.clearInterval(this.leftTimer);
-    window.clearInterval(this.rightTimer);
+    window.clearTimeout(this.leftTimer);
+    window.clearTimeout(this.rightTimer);
   }
 
   handleKeydown = (e: KeyboardEvent) => {
