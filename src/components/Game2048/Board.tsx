@@ -2,7 +2,7 @@ import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import Canvas from '../Canvas';
 import { WithBoardStore } from './stores';
-import brown from 'material-ui/colors/brown';
+import brown from '@material-ui/core/colors/brown';
 
 export interface BoardProps {
   className?: string;

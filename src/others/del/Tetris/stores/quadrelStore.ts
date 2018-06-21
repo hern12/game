@@ -1,10 +1,10 @@
 import { observable, action, computed } from 'mobx';
-import red from 'material-ui/colors/red';
-import green from 'material-ui/colors/green';
-import blue from 'material-ui/colors/blue';
-import yellow from 'material-ui/colors/yellow';
-import grey from 'material-ui/colors/grey';
-import deepPurple from 'material-ui/colors/deepPurple';
+import red from '@material-ui/core/colors/red';
+import green from '@material-ui/core/colors/green';
+import blue from '@material-ui/core/colors/blue';
+import yellow from '@material-ui/core/colors/yellow';
+import grey from '@material-ui/core/colors/grey';
+import deepPurple from '@material-ui/core/colors/deepPurple';
 import boardStore from './boardStore';
 import heapStore from './heapStore';
 
@@ -21,43 +21,43 @@ const SHAPES = (() => {
   const createShape = (...args: number[]): Shape => {
     return [{ x: args[0], y: args[1] }, { x: args[2], y: args[3] }, { x: args[4], y: args[5] }, { x: args[6], y: args[7] }];
   };
-  let S: Shape[] = [
+  const S: Shape[] = [
     createShape(0, 0, 1, 0, -1, 1, 0, 1),
     createShape(0, -1, 0, 0, 1, 0, 1, 1),
     createShape(0, 0, 1, 0, -1, 1, 0, 1),
     createShape(0, -1, 0, 0, 1, 0, 1, 1),
   ];
-  let Z: Shape[] = [
+  const Z: Shape[] = [
     createShape(-1, 0, 0, 0, 0, 1, 1, 1),
     createShape(0, -1, -1, 0, 0, 0, -1, 1),
     createShape(-1, 0, 0, 0, 0, 1, 1, 1),
     createShape(0, -1, -1, 0, 0, 0, -1, 1),
   ];
-  let L: Shape[] = [
+  const L: Shape[] = [
     createShape(0, -1, 0, 0, 0, 1, 1, 1),
     createShape(-1, 0, 0, 0, 1, 0, -1, 1),
     createShape(-1, -1, 0, -1, 0, 0, 0, 1),
     createShape(1, -1, -1, 0, 0, 0, 1, 0)
   ];
-  let J: Shape[] = [
+  const J: Shape[] = [
     createShape(0, -1, 0, 0, 0, 1, -1, 1),
     createShape(-1, -1, -1, 0, 0, 0, 1, 0),
     createShape(0, -1, 1, -1, 0, 0, 0, 1),
     createShape(-1, 0, 0, 0, 1, 0, 1, 1)
   ];
-  let I: Shape[] = [
+  const I: Shape[] = [
     createShape(-1, 0, 0, 0, 1, 0, 2, 0),
     createShape(0, -1, 0, 0, 0, 1, 0, 2),
     createShape(-1, 0, 0, 0, 1, 0, 2, 0),
     createShape(0, -1, 0, 0, 0, 1, 0, 2)
   ];
-  let O: Shape[] = [
+  const O: Shape[] = [
     createShape(0, 0, 1, 0, 0, 1, 1, 1),
     createShape(0, 0, 1, 0, 0, 1, 1, 1),
     createShape(0, 0, 1, 0, 0, 1, 1, 1),
     createShape(0, 0, 1, 0, 0, 1, 1, 1),
   ];
-  let T: Shape[] = [
+  const T: Shape[] = [
     createShape(-1, 0, 0, 0, 1, 0, 0, 1),
     createShape(0, -1, 0, 0, 0, 1, -1, 0),
     createShape(-1, 0, 0, 0, 1, 0, 0, -1),
@@ -270,7 +270,7 @@ export class QuadrelStore {
     if (farLeftPoint.x < 1) {
       return null;
     }
-    const leftMovedQuadrelsType = quadrelsType.map(({ x, y }) => ({ x: x - 1, y: y }));
+    const leftMovedQuadrelsType = quadrelsType.map(({ x, y }) => ({ x: x - 1, y }));
     if (leftMovedQuadrelsType.every(point => !this.include(point))) {
       return { x: this.fallPoint.x - 1, y: this.fallPoint.y };
     }
@@ -283,7 +283,7 @@ export class QuadrelStore {
     if (farRightQuadrel.x > this.boardStore.col - 2) {
       return null;
     }
-    const rightMovedQuadrelsType = quadrelsType.map(({ x, y }) => ({ x: x + 1, y: y }));
+    const rightMovedQuadrelsType = quadrelsType.map(({ x, y }) => ({ x: x + 1, y }));
     if (rightMovedQuadrelsType.every(point => !this.include(point))) {
       return { x: this.fallPoint.x + 1, y: this.fallPoint.y };
     }
@@ -296,7 +296,7 @@ export class QuadrelStore {
     if (farBottomPoint.y > this.boardStore.row - 2) {
       return null;
     }
-    const bottomMovedQuadrelsType = quadrelsType.map(({ x, y }) => ({ x: x, y: y + 1 }));
+    const bottomMovedQuadrelsType = quadrelsType.map(({ x, y }) => ({ x, y: y + 1 }));
     if (bottomMovedQuadrelsType.every(point => !this.include(point))) {
       return { x: this.fallPoint.x, y: this.fallPoint.y + 1 };
     }
@@ -306,7 +306,7 @@ export class QuadrelStore {
   canChangeType(fallPoint: Point, quadrelsType: Point[]): Point | null {
     const { x, y } = fallPoint;
     const { heap } = this.heapStore;
-    let newPoint = { x, y };
+    const newPoint = { x, y };
     let leftBoundary = x;
     let rightBoundary = x;
     while (leftBoundary > 0) {
@@ -338,7 +338,7 @@ export class QuadrelStore {
         return null;
       }
       const bottomMovedQuadrelsType = quadrelsType.map(p => ({ x: p.x + newPoint.x, y: p.y + newPoint.y + 1 }));
-      if (bottomMovedQuadrelsType.every(p => !heap.some(({ point: { x, y } }) => p.x === x && p.y === y))) {
+      if (bottomMovedQuadrelsType.every(p => !heap.some(({ point }) => p.x === point.x && p.y === point.y))) {
         return newPoint;
       }
     }

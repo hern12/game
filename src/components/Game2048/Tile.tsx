@@ -1,14 +1,16 @@
+import grey from '@material-ui/core/colors/grey';
+import red from '@material-ui/core/colors/red';
+import orange from '@material-ui/core/colors/orange';
+import deepOrange from '@material-ui/core/colors/deepOrange';
+import pink from '@material-ui/core/colors/pink';
+import purple from '@material-ui/core/colors/purple';
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import Canvas from '../Canvas';
 import { WithTileStore } from './stores';
-import orange from 'material-ui/colors/orange';
-import deepOrange from 'material-ui/colors/deepOrange';
-import red from 'material-ui/colors/red';
-import pink from 'material-ui/colors/pink';
-import purple from 'material-ui/colors/purple';
-import grey from 'material-ui/colors/grey';
 
+const red400 = red[400];
+const grey50 = grey[50];
 const colors = {
   2: orange[50],
   4: orange[200],
@@ -54,25 +56,25 @@ class Tile extends React.Component<TilePropsWithStore> {
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.font = '32px sans-serif';
-            ctx.fillStyle = grey[800];
+            ctx.fillStyle = '#000';
             ctx.fillText(value.toString(), col * length + gup + size / 2, row * length + gup + size / 2);
           
             ctx.textAlign = 'start';
             ctx.textBaseline = 'top';
             ctx.font = '16px sans-serif';
-            ctx.fillStyle = grey[800];
+            ctx.fillStyle = grey50;
             ctx.fillText('Score', width + gup, gup);
-            ctx.fillStyle = red[800];
+            ctx.fillStyle = red400;
             ctx.fillText(score.toString(), width + gup, 16 + 2 * gup);
 
-            ctx.fillStyle = grey[800];
+            ctx.fillStyle = grey50;
             ctx.fillText('BestScore', width + gup, 32 + 3 * gup);
-            ctx.fillStyle = red[800];
+            ctx.fillStyle = red400;
             ctx.fillText(bestScore.toString(), width + gup, 48 + 4 * gup);
 
             if (gameover) {
               ctx.font = '32px sans-serif';
-              ctx.fillStyle = red[800];
+              ctx.fillStyle = red400;
               ctx.fillText('Gameover!', width + gup, 64 + 6 * gup);
             }
           });

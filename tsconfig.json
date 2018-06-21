@@ -1,5 +1,12 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "*",
+        "src/*"
+      ]
+    },
     "outDir": "build/dist",
     "module": "esnext",
     "target": "es5",
@@ -9,7 +16,6 @@
     "jsx": "react",
     "moduleResolution": "node",
     "rootDir": "src",
-    "baseUrl": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,

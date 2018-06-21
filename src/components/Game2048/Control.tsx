@@ -1,7 +1,7 @@
-import * as React from 'react';
+import Button from '@material-ui/core/Button';
 import { inject, observer } from 'mobx-react';
+import * as React from 'react';
 import { WithTileStore } from './stores';
-import { Button } from 'material-ui';
 
 const KEY = {
   LEFT: 37,
@@ -77,7 +77,7 @@ class Control extends React.Component<ControlPropsWithStore> {
       <div className={className} style={{ position: 'absolute', top: height - (36 + 2 * gup), left: width + gup }}>
         <Button
           variant="raised"
-          color="secondary"
+          color="primary"
           style={{ margin: gup }}
           onClick={this.handleNewGame}
         >

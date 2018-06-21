@@ -2,7 +2,7 @@ import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import Canvas from '../Canvas';
 import { WithBoardStore } from './stores';
-import grey from 'material-ui/colors/grey';
+import grey from '@material-ui/core/colors/grey';
 
 export interface BoardProps {
   className?: string;
@@ -30,9 +30,9 @@ class Board extends React.Component<BoardPropsWithStore> {
           flag2 = flag1;
           return Array(col).fill(1).map((v2, c) => {
             flag2 = !flag2;
-            let x = c * length + gup;
-            let y = r * length + gup;
-            let color = flag2 ? grey[200] : grey[300];
+            const x = c * length + gup;
+            const y = r * length + gup;
+            const color = flag2 ? grey[200] : grey[300];
             return (
               <Canvas.RoundedRect key={`board-grid(${r},${c})`} x={x} y={y} width={size} height={size} radius={gup} fill={color} />
             );

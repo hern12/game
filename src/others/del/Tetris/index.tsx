@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Provider } from 'mobx-react';
-import { withStyles, WithStyles } from 'material-ui/styles';
+import { withStyles, WithStyles } from '@material-ui/core/styles';
 import Board from './Board';
 import Quadrel from './Quadrel';
 import stores from './stores'

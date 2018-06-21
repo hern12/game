@@ -12,7 +12,7 @@ class Matrix<T> {
   readonly size: number;
 
   constructor(size: number) {
-    let value: T[][] = [];
+    const value: T[][] = [];
     let i = size;
     while (i-- > 0) {
       value.push(Array(size).fill(null));
@@ -22,7 +22,7 @@ class Matrix<T> {
   }
 
   get emptyPositions(): Position[] {
-    let positions: Position[] = [];
+    const positions: Position[] = [];
     this.value.forEach((eachRow, row) => {
       eachRow.forEach((eachValue, col) => {
         if (eachValue === null) {
@@ -34,7 +34,7 @@ class Matrix<T> {
   }
 
   transposeMatrix(): void {
-    let value = new Matrix<T>(this.size).value;
+    const value = new Matrix<T>(this.size).value;
     this.value.forEach((eachRow, row) => eachRow.forEach((eachValue, column) => {
       value[column][row] = this.value[row][column];
     }));
@@ -77,7 +77,7 @@ class TileMatrix extends Matrix<Tile | null> {
   }
 
   get tiles(): Tile[] {
-    let tiles: Tile[] = [];
+    const tiles: Tile[] = [];
     this.value.forEach((eachRow, row) => eachRow.forEach((eachValue, col) => {
       if (eachValue !== null) {
         tiles.push({ ...eachValue, row, col });
@@ -124,9 +124,9 @@ class TileMatrix extends Matrix<Tile | null> {
     });
   }
 
-  private moveRowToFront(row: (Tile | null)[], getScore: (score: number) => void): (Tile | null)[] {
-    let newRow: (Tile | null)[] = [];
-    let length = row.length;
+  private moveRowToFront(row: Array<Tile | null>, getScore: (score: number) => void): Array<Tile | null> {
+    const newRow: Array<Tile | null> = [];
+    const length = row.length;
     let head = 0;
     let tail = length - 1;
     let prevValue = NaN;
@@ -148,7 +148,7 @@ class TileMatrix extends Matrix<Tile | null> {
     return newRow;
   }
 
-  private moveRowToBack(row: (Tile | null)[], getScore: (score: number) => void): (Tile | null)[] {
+  private moveRowToBack(row: Array<Tile | null>, getScore: (score: number) => void): Array<Tile | null> {
     return this.moveRowToFront([...row].reverse(), getScore).reverse();
   }
 }
@@ -189,7 +189,7 @@ class TileStore implements Move {
   }
 
   @action onRestart({ initCount = 2, score = 0, bestScore = this.bestScore }: MatrixStoreRestartOptions = {}) {
-    let tileMatrix = new TileMatrix(this.size);
+    const tileMatrix = new TileMatrix(this.size);
     while (initCount-- > 0) {
       if (!tileMatrix.addTile()) {
         break;
@@ -222,7 +222,7 @@ class TileStore implements Move {
   }
 
   @computed get up(): TileMove {
-    let tileMatrix = new TileMatrix(this.size, this.tiles);
+    const tileMatrix = new TileMatrix(this.size, this.tiles);
     tileMatrix.transposeMatrix();
     let sumScore = 0;
     tileMatrix.moveToFront((score) => { sumScore += score; });
@@ -236,7 +236,7 @@ class TileStore implements Move {
   }
 
   @computed get down(): TileMove {
-    let tileMatrix = new TileMatrix(this.size, this.tiles);
+    const tileMatrix = new TileMatrix(this.size, this.tiles);
     tileMatrix.transposeMatrix();
     let sumScore = 0;
     tileMatrix.moveToBack((score) => { sumScore += score; });
@@ -250,7 +250,7 @@ class TileStore implements Move {
   }
 
   @computed get left(): TileMove {
-    let tileMatrix = new TileMatrix(this.size, this.tiles);
+    const tileMatrix = new TileMatrix(this.size, this.tiles);
     let sumScore = 0;
     tileMatrix.moveToFront((score) => { sumScore += score; });
     return {
@@ -262,7 +262,7 @@ class TileStore implements Move {
   }
 
   @computed get right(): TileMove {
-    let tileMatrix = new TileMatrix(this.size, this.tiles);
+    const tileMatrix = new TileMatrix(this.size, this.tiles);
     let sumScore = 0;
     tileMatrix.moveToBack((score) => { sumScore += score; });
     return {

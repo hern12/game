@@ -1,9 +1,12 @@
-import * as React from 'react';
+import grey from '@material-ui/core/colors/grey';
+import red from '@material-ui/core/colors/red';
 import { inject, observer } from 'mobx-react';
+import * as React from 'react';
 import Canvas from '../Canvas';
 import { WithHeapStore } from './stores';
-import grey from 'material-ui/colors/grey';
-import red from 'material-ui/colors/red';
+
+const red400 = red[400];
+const grey50 = grey[50];
 
 export interface HeapProps {
   className?: string;
@@ -42,19 +45,19 @@ class Heap extends React.Component<HeapPropsWithStore> {
           ctx.textAlign = 'start';
           ctx.textBaseline = 'top';
           ctx.font = '16px sans-serif';
-          ctx.fillStyle = grey[800];
+          ctx.fillStyle = grey50;
           ctx.fillText('Score', width + length, top + 2 * gup);
-          ctx.fillStyle = red[800];
+          ctx.fillStyle = red400;
           ctx.fillText(score.toString(), width + length, top + 16 + 4 * gup);
 
-          ctx.fillStyle = grey[800];
+          ctx.fillStyle = grey50;
           ctx.fillText('BestScore', width + length, top + 32 + 6 * gup);
-          ctx.fillStyle = red[800];
+          ctx.fillStyle = red400;
           ctx.fillText(bestScore.toString(), width + length, top + 48 + 8 * gup);
 
           if (gameover) {
             ctx.font = '32px sans-serif';
-            ctx.fillStyle = red[800];
+            ctx.fillStyle = red400;
             ctx.fillText('Gameover!', width + length, top + 64 + 10 * gup);
           }
         }}

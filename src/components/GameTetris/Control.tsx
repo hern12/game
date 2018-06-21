@@ -1,7 +1,9 @@
-import * as React from 'react';
+import Button from '@material-ui/core/Button';
+import Switch from '@material-ui/core/Switch';
 import { inject, observer } from 'mobx-react';
+import * as React from 'react';
 import { WithQuadrelStore } from './stores';
-import { Button } from 'material-ui';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 
 const KEY = {
   SPACE: 32,
@@ -60,7 +62,7 @@ class Control extends React.Component<ControlPropsWithStore> {
           this.leftKeyPress = true;
           this.props.quadrelStore!.onLeft();
           let timeout = 125;
-          let interval = () => {
+          const interval = () => {
             window.clearTimeout(this.leftTimer);
             this.props.quadrelStore!.onLeft();
             timeout = Math.max(timeout - 25, 25);
@@ -76,7 +78,7 @@ class Control extends React.Component<ControlPropsWithStore> {
           this.rightKeyPress = true;
           this.props.quadrelStore!.onRight();
           let timeout = 125;
-          let interval = () => {
+          const interval = () => {
             window.clearTimeout(this.rightTimer);
             this.props.quadrelStore!.onRight();
             timeout = Math.max(timeout - 25, 25);
@@ -146,18 +148,20 @@ class Control extends React.Component<ControlPropsWithStore> {
     const { width, height, length, gup } = quadrelStore!.boardStore!;
     return (
       <div className={className} style={{ position: 'absolute', top: height - (72 + 4 * gup), left: width + length }}>
-        <Button
-          variant="raised"
-          color={this.props.quadrelStore!.pause ? 'default' : 'secondary'}
-          style={{ margin: gup }}
-          onClick={this.handlePause}
-        >
-          (P) Pause
-        </Button>
+        <FormControlLabel
+          label="(P) Pause"
+          control={
+            <Switch
+              color="primary"
+              checked={quadrelStore!.pause}
+              onChange={this.handlePause}
+            />
+          }
+        />
         <br />
         <Button
           variant="raised"
-          color="secondary"
+          color="primary"
           style={{ margin: gup }}
           onClick={this.handleNewGame}
         >

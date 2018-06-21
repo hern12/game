@@ -1,10 +1,10 @@
 import { observable, action, computed } from 'mobx';
-import red from 'material-ui/colors/red';
-import green from 'material-ui/colors/green';
-import blue from 'material-ui/colors/blue';
-import yellow from 'material-ui/colors/yellow';
-import grey from 'material-ui/colors/grey';
-import deepPurple from 'material-ui/colors/deepPurple';
+import red from '@material-ui/core//colors/red';
+import green from '@material-ui/core//colors/green';
+import blue from '@material-ui/core//colors/blue';
+import yellow from '@material-ui/core//colors/yellow';
+import grey from '@material-ui/core//colors/grey';
+import deepPurple from '@material-ui/core//colors/deepPurple';
 import boardStore from './boardStore';
 import heapStore from './heapStore';
 
@@ -21,43 +21,43 @@ const SHAPES = (() => {
   const createShape = (...args: number[]): Shape => {
     return [{ x: args[0], y: args[1] }, { x: args[2], y: args[3] }, { x: args[4], y: args[5] }, { x: args[6], y: args[7] }];
   };
-  let S: Shape[] = [
+  const S: Shape[] = [
     createShape(0, 0, 1, 0, -1, 1, 0, 1),
     createShape(0, -1, 0, 0, 1, 0, 1, 1),
     createShape(0, 0, 1, 0, -1, 1, 0, 1),
     createShape(0, -1, 0, 0, 1, 0, 1, 1),
   ];
-  let Z: Shape[] = [
+  const Z: Shape[] = [
     createShape(-1, 0, 0, 0, 0, 1, 1, 1),
     createShape(0, -1, -1, 0, 0, 0, -1, 1),
     createShape(-1, 0, 0, 0, 0, 1, 1, 1),
     createShape(0, -1, -1, 0, 0, 0, -1, 1),
   ];
-  let L: Shape[] = [
+  const L: Shape[] = [
     createShape(0, -1, 0, 0, 0, 1, 1, 1),
     createShape(-1, 0, 0, 0, 1, 0, -1, 1),
     createShape(-1, -1, 0, -1, 0, 0, 0, 1),
     createShape(1, -1, -1, 0, 0, 0, 1, 0)
   ];
-  let J: Shape[] = [
+  const J: Shape[] = [
     createShape(0, -1, 0, 0, 0, 1, -1, 1),
     createShape(-1, -1, -1, 0, 0, 0, 1, 0),
     createShape(0, -1, 1, -1, 0, 0, 0, 1),
     createShape(-1, 0, 0, 0, 1, 0, 1, 1)
   ];
-  let I: Shape[] = [
+  const I: Shape[] = [
     createShape(-1, 0, 0, 0, 1, 0, 2, 0),
     createShape(0, -1, 0, 0, 0, 1, 0, 2),
     createShape(-1, 0, 0, 0, 1, 0, 2, 0),
     createShape(0, -1, 0, 0, 0, 1, 0, 2)
   ];
-  let O: Shape[] = [
+  const O: Shape[] = [
     createShape(0, 0, 1, 0, 0, 1, 1, 1),
     createShape(0, 0, 1, 0, 0, 1, 1, 1),
     createShape(0, 0, 1, 0, 0, 1, 1, 1),
     createShape(0, 0, 1, 0, 0, 1, 1, 1),
   ];
-  let T: Shape[] = [
+  const T: Shape[] = [
     createShape(-1, 0, 0, 0, 1, 0, 0, 1),
     createShape(0, -1, 0, 0, 0, 1, -1, 0),
     createShape(-1, 0, 0, 0, 1, 0, 0, -1),
@@ -159,7 +159,7 @@ export class QuadrelStore {
 
   @action onLeft() {
     if (!this.pause && !this.heapStore.gameover) {
-      let newPoint = { x: this.fallPoint.x - 1, y: this.fallPoint.y };
+      const newPoint = { x: this.fallPoint.x - 1, y: this.fallPoint.y };
       if (this.testQuadrelsType(newPoint, this.nowQuadrelsType)) {
         this.fallPoint = newPoint;
       }
@@ -168,7 +168,7 @@ export class QuadrelStore {
 
   @action onRight() {
     if (!this.pause && !this.heapStore.gameover) {
-      let newPoint = { x: this.fallPoint.x + 1, y: this.fallPoint.y };
+      const newPoint = { x: this.fallPoint.x + 1, y: this.fallPoint.y };
       if (this.testQuadrelsType(newPoint, this.nowQuadrelsType)) {
         this.fallPoint = newPoint;
       }
@@ -187,7 +187,7 @@ export class QuadrelStore {
     this.rate = this.rate + this.plusRate + this.up;
     if (this.rate > this.full) {
       this.rate = 0;
-      let newPoint = { x: this.fallPoint.x, y: this.fallPoint.y + 1 };
+      const newPoint = { x: this.fallPoint.x, y: this.fallPoint.y + 1 };
       if (this.testQuadrelsType(newPoint, this.nowQuadrelsType)) {
         this.fallPoint = newPoint;
       } else {
@@ -301,46 +301,6 @@ export class QuadrelStore {
       }
     }
     return null;
-    // const { x, y } = fallPoint;
-    // const { heap } = this.heapStore;
-    // let newPoint = { x, y };
-    // let leftBoundary = x;
-    // let rightBoundary = x;
-    // while (leftBoundary > 0) {
-    //   if (heap.some(({ point }) => point.x === leftBoundary && point.y === y)) {
-    //     break;
-    //   }
-    //   leftBoundary--;
-    // }
-    // while (rightBoundary < this.boardStore.col - 1) {
-    //   if (heap.some(({ point }) => point.x === rightBoundary && point.y === y)) {
-    //     break;
-    //   }
-    //   rightBoundary++;
-    // }
-    // const activitySpace = rightBoundary - leftBoundary + 1;
-    // console.log(activitySpace);
-    // const farLeftPoint = quadrelsType.reduce((prev, curr) => curr.x < prev.x ? curr : prev);
-    // const farRightPoint = quadrelsType.reduce((prev, curr) => curr.x > prev.x ? curr : prev);
-    // const quadrelsTypeSpace = farRightPoint.x - farLeftPoint.x + 1;
-    // const farLeftRealPoint = farLeftPoint.x + x;
-    // const farRightRealPoint = farRightPoint.x + x;
-    // if (quadrelsTypeSpace <= activitySpace) {
-    //   if (farLeftRealPoint < leftBoundary) {
-    //     newPoint.x += leftBoundary - farLeftRealPoint;
-    //   } else if (farRightRealPoint > rightBoundary) {
-    //     newPoint.x -= farRightRealPoint - rightBoundary;
-    //   }
-    //   const farBottomPoint = quadrelsType.reduce((prev, curr) => curr.y > prev.y ? curr : prev);
-    //   if (farBottomPoint.y + newPoint.y + 2 > this.boardStore.row) {
-    //     return null;
-    //   }
-    //   const bottomMovedQuadrelsType = quadrelsType.map(p => ({ x: p.x + newPoint.x, y: p.y + newPoint.y + 1 }));
-    //   if (bottomMovedQuadrelsType.every(p => !heap.some(({ point: { x, y } }) => p.x === x && p.y === y))) {
-    //     return newPoint;
-    //   }
-    // }
-    // return null;
   };
 }
 

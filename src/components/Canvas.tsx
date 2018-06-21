@@ -9,8 +9,8 @@ export interface CanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElemen
 class Canvas extends React.Component<CanvasProps> {
   private canvasRefObject: React.RefObject<HTMLCanvasElement>;
 
-  constructor(props: CanvasProps) {
-    super(props);
+  constructor(props: CanvasProps, context: any) {
+    super(props, context);
     this.canvasRefObject = React.createRef();
   }
 
@@ -29,7 +29,6 @@ class Canvas extends React.Component<CanvasProps> {
   draw() {
     const { children } = this.props;
     if (children && typeof children === 'function') {
-      // 把canvas实例的ctx对象，和一些绘制方法传递给children方法
       children(this.getCanvasContext2D(), { setRoundedRectPath: this.setRoundedRectPath });
     }
   }
@@ -48,7 +47,6 @@ class Canvas extends React.Component<CanvasProps> {
     return ctx;
   }
 
-  // 公开一个绘制圆角矩形路径的方法
   setRoundedRectPath(ctx: CanvasRenderingContext2D, x = 0, y = 0, width = 0, height = 0, radius = 0) {
     ctx.beginPath();
     ctx.moveTo(x, y + radius);

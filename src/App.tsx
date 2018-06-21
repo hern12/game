@@ -1,56 +1,56 @@
+import AppBar from '@material-ui/core/AppBar';
+import { createStyles, withStyles, WithStyles } from '@material-ui/core/styles';
+import Tab from '@material-ui/core/Tab';
+import Tabs from '@material-ui/core/Tabs';
 import * as React from 'react';
-import { configure } from 'mobx';
-import CssBaseline from 'material-ui/CssBaseline';
-import AppBar from 'material-ui/AppBar';
-import Tabs, { Tab } from 'material-ui/Tabs';
-import { MuiThemeProvider } from 'material-ui/styles';
-import createAppTheme from './theme';
 import Game2048 from './components/Game2048';
 import GameTetris from './components/GameTetris';
 
-configure({ enforceActions: true });
+const games = { GameTetris, Game2048 };
 
-const theme = createAppTheme();
+type Games = keyof typeof games;
 
-const games = { Game2048, GameTetris };
+const styles = createStyles({
+  labelContainer: {
+    textTransform: 'none',
+  },
+});
 
-export interface AppProps { }
-
-type Game = keyof typeof games;
+export interface AppProps extends WithStyles<typeof styles> { }
 
 interface AppState {
-  game: Game
+  value: Games;
 }
 
-class App extends React.PureComponent<AppProps, AppState> {
+class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props);
-    this.state = { game: 'Game2048' };
+    this.state = { value: 'GameTetris' };
   }
 
-  handleChangeGame = (e: React.ChangeEvent<{}>, game: Game) => {
-    this.setState({ game });
+  handleChange = (e: React.ChangeEvent, value: Games) => {
+    this.setState({ value });
   }
 
   render() {
-    const { game } = this.state;
-    const Game = games[game];
+    const { classes } = this.props;
+    const { value } = this.state;
+    const Game = games[value];
     return (
-      <MuiThemeProvider theme={theme}>
-        <CssBaseline>
-          <main>
-            <AppBar position="static">
-              <Tabs value={game} onChange={this.handleChangeGame}>
-                <Tab value="Game2048" label="Game 2048" />
-                <Tab value="GameTetris" label="Game Tetris" />
-              </Tabs>  
-            </AppBar>
-            <Game />
-          </main>
-        </CssBaseline>
-      </MuiThemeProvider>
+      <>
+        <AppBar position="static">
+          <Tabs value={value} onChange={this.handleChange}>
+            {Object.keys(games).map((game) => (
+              <Tab key={game} value={game} label={game} classes={{ labelContainer: classes.labelContainer }} />
+            ))}
+          </Tabs>
+        </AppBar>
+        <main>
+          <Game />
+        </main>
+      </>
     );
   }
 }
 
-export default App;
+export default withStyles(styles)(App);

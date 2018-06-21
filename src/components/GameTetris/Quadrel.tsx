@@ -1,8 +1,8 @@
+import grey from '@material-ui/core/colors/grey';
 import * as React from 'react';
 import { inject, observer } from 'mobx-react';
 import Canvas from '../Canvas';
 import { WithQuadrelStore } from './stores';
-import grey from 'material-ui/colors/grey';
 
 export interface QuadrelProps { 
   className?: string;
@@ -54,7 +54,7 @@ class Quadrel extends React.Component<QuadrelPropsWithStore> {
           ctx.font = '32px sans-serif';
           ctx.textAlign = 'start';
           ctx.textBaseline = 'top';
-          ctx.fillStyle = grey[800];
+          ctx.fillStyle = grey[50];
           ctx.fillText('Next', width + length, gup);
         }}
       </Canvas>
