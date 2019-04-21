@@ -3,13 +3,15 @@
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
-      "node_modules/**/*.ts"
+      "node_modules/**/*.ts",
+      "coverage/lcov-report/*.js"
     ]
   },
   "rules": {
     "ordered-imports": false,
     "object-literal-sort-keys": false,
     "curly": false,
+    "ban-types": false,
     "variable-name": false,
     "interface-over-type-literal": false,
     "interface-name": false,

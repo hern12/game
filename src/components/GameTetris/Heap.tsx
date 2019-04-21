@@ -1,8 +1,8 @@
+import React from 'react';
+import { inject, observer } from 'mobx-react';
 import grey from '@material-ui/core/colors/grey';
 import red from '@material-ui/core/colors/red';
-import { inject, observer } from 'mobx-react';
-import * as React from 'react';
-import Canvas from '../Canvas';
+import Canvas, { Rect, Text } from '../Canvas';
 import { WithHeapStore } from './stores';
 
 const red400 = red[400];
@@ -26,41 +26,57 @@ class Heap extends React.Component<HeapPropsWithStore> {
     const { width, height, length/*, size*/, gup } = heapStore!.boardStore;
     const { heap, score, bestScore, gameover } = heapStore!;
     const newWidth = width + 6 * length;
+    const top = 6 * length + gup + 32;
     return (
       <Canvas className={className} width={newWidth} height={height}>
-        {(ctx, funs) => {
-          ctx.clearRect(0, 0, newWidth, height);
-
-          heap.forEach(({ point: { x, y }, color }) => {
-            // funs.setRoundedRectPath(ctx, x * length + gup, y * length + gup, size, size, gup / 2);
-            funs.setRoundedRectPath(ctx, x * length + gup / 2, y * length + gup / 2, length, length, gup / 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-            ctx.lineWidth = gup;
-            ctx.strokeStyle = '#fff';
-            ctx.stroke();
-          });
-
-          const top = 6 * length + gup + 32;
-          ctx.textAlign = 'start';
-          ctx.textBaseline = 'top';
-          ctx.font = '16px sans-serif';
-          ctx.fillStyle = grey50;
-          ctx.fillText('Score', width + length, top + 2 * gup);
-          ctx.fillStyle = red400;
-          ctx.fillText(score.toString(), width + length, top + 16 + 4 * gup);
-
-          ctx.fillStyle = grey50;
-          ctx.fillText('BestScore', width + length, top + 32 + 6 * gup);
-          ctx.fillStyle = red400;
-          ctx.fillText(bestScore.toString(), width + length, top + 48 + 8 * gup);
-
-          if (gameover) {
-            ctx.font = '32px sans-serif';
-            ctx.fillStyle = red400;
-            ctx.fillText('Gameover!', width + length, top + 64 + 10 * gup);
-          }
-        }}
+        <Text
+          text="Score"
+          x={width + length}
+          y={top + 2 * gup}
+          fillStyle={grey50}
+        />
+        <Text
+          text={score.toString()}
+          x={width + length}
+          y={top + 16 + 4 * gup}
+          font="16px"
+          fillStyle={red400}
+        />
+        <Text
+          text="Best Score"
+          x={width + length}
+          y={top + 32 + 6 * gup}
+          fillStyle={grey50}
+        />
+        <Text
+          text={bestScore.toString()}
+          x={width + length}
+          y={top + 48 + 8 * gup}
+          fillStyle={red400}
+        />
+        {gameover && (
+          <Text
+            key="gameover"
+            text="Gameover!"
+            x={width + length}
+            y={top + 64 + 10 * gup}
+            fontSize={32}
+            fillStyle={red400}
+          />
+        )}
+        {heap.map(({ point: { x, y }, color }, i) => (
+          <Rect
+            key={'next' + i}
+            x={x * length + gup / 2}
+            y={y * length + gup / 2}
+            w={length}
+            h={length}
+            r={gup / 2}
+            fillStyle={color}
+            strokeStyle="#fff"
+            lineWidth={gup}
+          />
+        ))}
       </Canvas>
     );
   }

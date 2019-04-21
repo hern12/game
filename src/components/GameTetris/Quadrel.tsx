@@ -1,7 +1,7 @@
-import grey from '@material-ui/core/colors/grey';
-import * as React from 'react';
+import React from 'react';
 import { inject, observer } from 'mobx-react';
-import Canvas from '../Canvas';
+import grey from '@material-ui/core/colors/grey';
+import Canvas, { Rect, Text } from '../Canvas';
 import { WithQuadrelStore } from './stores';
 
 export interface QuadrelProps { 
@@ -19,44 +19,49 @@ class Quadrel extends React.Component<QuadrelPropsWithStore> {
 
   render() {
     const { className, quadrelStore } = this.props;
-    const { width, height, length/*, size*/, gup } = quadrelStore!.boardStore!;
-    const { nowQuadrels, nextQuadrels } = quadrelStore!;
-    const newWidth = width + 6 * length;
+    const { width, height, length, gup } = quadrelStore!.boardStore!;
+    const { nowQuadrels, nextQuadrels, show } = quadrelStore!;
+    const farLeft = nextQuadrels.reduce<number>((prev, curr) => prev < curr.point.x ? prev : curr.point.x, 0);
+    const farTop = nextQuadrels.reduce<number>((prev, curr) => prev < curr.point.y ? prev : curr.point.y, 0);
+    const offsetX = 1 - farLeft;
+    const offsetY = 32 + length + gup - farTop * length;
     return (
-      <Canvas className={className} width={newWidth} height={height}>
-        {(ctx, funs) => {
-          ctx.clearRect(0, 0, newWidth, height);
-
-          nowQuadrels.forEach(({ point: { x, y }, color }) => {
-            // funs.setRoundedRectPath(ctx, x * length + gup, y * length + gup, size, size, gup / 2);
-            funs.setRoundedRectPath(ctx, x * length + gup / 2, y * length + gup / 2, length, length, gup / 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-            ctx.lineWidth = gup;
-            ctx.strokeStyle = '#fff';
-            ctx.stroke();
-          });
-
-          const farLeft = nextQuadrels.reduce<number>((prev, curr) => prev < curr.point.x ? prev : curr.point.x, 0);
-          const farTop = nextQuadrels.reduce<number>((prev, curr) => prev < curr.point.y ? prev : curr.point.y, 0);
-          const offsetX = 1 - farLeft;
-          const offsetY = 32 + length + gup - farTop * length;
-          nextQuadrels.forEach(({ point: { x, y }, color }) => {
-            // funs.setRoundedRectPath(ctx, width + (x + offsetX) * length + gup, y * length + gup + offsetY, size, size, gup / 2);
-            funs.setRoundedRectPath(ctx, width + (x + offsetX) * length + gup / 2, y * length + gup / 2 + offsetY, length, length, gup / 2);
-            ctx.fillStyle = color;
-            ctx.fill();
-            ctx.lineWidth = gup;
-            ctx.strokeStyle = '#fff';
-            ctx.stroke();
-          });
-          
-          ctx.font = '32px sans-serif';
-          ctx.textAlign = 'start';
-          ctx.textBaseline = 'top';
-          ctx.fillStyle = grey[50];
-          ctx.fillText('Next', width + length, gup);
-        }}
+      <Canvas className={className} width={width + 6 * length} height={height}>
+        <Text
+          text="Next"
+          x={width + length}
+          y={gup}
+          fontSize={32}
+          textAlign="start"
+          textBaseline="top"
+          fillStyle={grey[50]}
+        />
+        {nextQuadrels.map(({ point: { x, y }, color }, i) => (
+          <Rect
+            key={'next' + i}
+            x={width + (x + offsetX) * length + gup / 2}
+            y={y * length + gup / 2 + offsetY}
+            w={length}
+            h={length}
+            r={gup / 2}
+            fillStyle={color}
+            strokeStyle="#fff"
+            lineWidth={gup}
+          />
+        ))}
+        {show && nowQuadrels.map(({ point: { x, y }, color }, i) => (
+          <Rect
+            key={'now' + i}
+            x={x * length + gup / 2}
+            y={y * length + gup / 2}
+            w={length}
+            h={length}
+            r={gup / 2}
+            fillStyle={color}
+            strokeStyle="#fff"
+            lineWidth={gup}
+          />
+        ))}
       </Canvas>
     );
   }

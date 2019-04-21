@@ -1,17 +1,17 @@
 import * as React from 'react';
 import { Provider } from 'mobx-react';
-import { createStyles, withStyles, Theme, WithStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/styles';
+import { Theme } from '@material-ui/core/styles';
 import Board from './Board';
 import Quadrel from './Quadrel';
 import Heap from './Heap';
 import Control from './Control';
 import stores from './stores';
-import { ClassKeys } from 'types';
 
-const styles = (theme: Theme) => createStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     position: 'relative',
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
   },
   board: {
     position: 'absolute',
@@ -28,13 +28,10 @@ const styles = (theme: Theme) => createStyles({
   control: {
     zIndex: 4,
   }
-});
+}));
 
-export type GameTetrisClassKey = ClassKeys<typeof styles>;
-
-export interface GameTetrisProps extends WithStyles<typeof styles> { }
-
-function GameTetris({ classes }: GameTetrisProps) {
+export default function GameTetris() {
+  const classes = useStyles();
   return (
     <Provider {...stores}>
       <div className={classes.root}>
@@ -46,5 +43,3 @@ function GameTetris({ classes }: GameTetrisProps) {
     </Provider>
   );
 }
-
-export default withStyles(styles)(GameTetris);

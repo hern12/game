@@ -1,12 +1,12 @@
+import React from 'react';
+import { inject, observer } from 'mobx-react';
 import grey from '@material-ui/core/colors/grey';
 import red from '@material-ui/core/colors/red';
 import orange from '@material-ui/core/colors/orange';
 import deepOrange from '@material-ui/core/colors/deepOrange';
 import pink from '@material-ui/core/colors/pink';
 import purple from '@material-ui/core/colors/purple';
-import * as React from 'react';
-import { inject, observer } from 'mobx-react';
-import Canvas from '../Canvas';
+import Canvas, { Rect, Text } from '../Canvas';
 import { WithTileStore } from './stores';
 
 const red400 = red[400];
@@ -45,40 +45,61 @@ class Tile extends React.Component<TilePropsWithStore> {
     const newWidth = width + 200;
     return (
       <Canvas className={className} width={newWidth} height={height}>
-        {(ctx, funs) => {
-          ctx.clearRect(0, 0, newWidth, height);
-
-          tiles.forEach(({ value, row, col }) => {
-            funs.setRoundedRectPath(ctx, col * length + gup, row * length + gup, size, size, gup / 2);
-            ctx.fillStyle = colors[value];
-            ctx.fill();
-
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.font = '32px sans-serif';
-            ctx.fillStyle = '#000';
-            ctx.fillText(value.toString(), col * length + gup + size / 2, row * length + gup + size / 2);
-          
-            ctx.textAlign = 'start';
-            ctx.textBaseline = 'top';
-            ctx.font = '16px sans-serif';
-            ctx.fillStyle = grey50;
-            ctx.fillText('Score', width + gup, gup);
-            ctx.fillStyle = red400;
-            ctx.fillText(score.toString(), width + gup, 16 + 2 * gup);
-
-            ctx.fillStyle = grey50;
-            ctx.fillText('BestScore', width + gup, 32 + 3 * gup);
-            ctx.fillStyle = red400;
-            ctx.fillText(bestScore.toString(), width + gup, 48 + 4 * gup);
-
-            if (gameover) {
-              ctx.font = '32px sans-serif';
-              ctx.fillStyle = red400;
-              ctx.fillText('Gameover!', width + gup, 64 + 6 * gup);
-            }
-          });
-        }}
+        <Text
+          text="Score"
+          x={width + gup}
+          y={gup}
+          fillStyle={grey50}
+        />
+        <Text
+          text={score.toString()}
+          x={width + gup}
+          y={16 + 2 * gup}
+          fillStyle={red400}
+        />
+        <Text
+          text="Best Score"
+          x={width + gup}
+          y={32 + 3 * gup}
+          fillStyle={grey50}
+        />
+        <Text
+          text={bestScore.toString()}
+          x={width + gup}
+          y={48 + 4 * gup}
+          fillStyle={red400}
+        />
+        {gameover && (
+          <Text
+            key="gameover"
+            text="Gameover!"
+            x={width + gup}
+            y={64 + 6 * gup}
+            fontSize={32}
+            fillStyle={red400}
+          />
+        )}
+        {tiles.map(({ value, row, col }, i) => (
+          <Rect
+            key={'tile' + i}
+            x={col * length + gup}
+            y={row * length + gup}
+            w={size}
+            h={size}
+            r={gup / 2}
+            fillStyle={colors[value]}
+          >
+            <Text
+              text={value.toString()}
+              x={col * length + gup + size / 2}
+              y={row * length + gup + size / 2}
+              fontSize={32}
+              textAlign="center"
+              textBaseline="middle"
+              fillStyle="#000"
+            />
+          </Rect>
+        ))}
       </Canvas>
     );
   }

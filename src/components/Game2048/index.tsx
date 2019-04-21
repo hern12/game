@@ -1,16 +1,16 @@
-import * as React from 'react';
+import React from 'react';
+import { makeStyles } from '@material-ui/styles';
+import { Theme } from '@material-ui/core/styles';
 import { Provider } from 'mobx-react';
-import { createStyles, withStyles, Theme, WithStyles } from '@material-ui/core/styles';
 import Board from './Board';
 import Tile from './Tile';
 import Control from './Control';
 import stores from './stores';
-import { ClassKeys } from 'types';
 
-const styles = (theme: Theme) => createStyles({
+const useStyles = makeStyles((theme: Theme) => ({
   root: {
     position: 'relative',
-    margin: theme.spacing.unit * 2,
+    margin: theme.spacing(2),
   },
   board: {
     position: 'absolute',
@@ -24,13 +24,10 @@ const styles = (theme: Theme) => createStyles({
     position: 'absolute',
     zIndex: 3,
   },
-});
+}));
 
-export type Game2048ClassKey = ClassKeys<typeof styles>;
-  
-export interface Game2048Props extends WithStyles<typeof styles> { }
-
-function Game2048({ classes }: Game2048Props) {
+export default function Game2048() {
+  const classes = useStyles();
   return (
     <Provider {...stores}>
       <div className={classes.root}>
@@ -41,5 +38,3 @@ function Game2048({ classes }: Game2048Props) {
     </Provider>
   );
 }
-
-export default withStyles(styles)(Game2048);

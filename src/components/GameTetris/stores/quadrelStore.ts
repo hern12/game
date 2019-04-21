@@ -68,7 +68,7 @@ const SHAPES = (() => {
 
 export type QuadrelCode = {
   shapeCode: number;
-  typeCode: number;
+  formCode: number;
   colorCode: number;
 }
 
@@ -83,6 +83,7 @@ export class QuadrelStore {
   @observable fallPoint: Point;
   @observable pause: boolean;
   @observable up: number;
+  @observable show: boolean;
 
   readonly boardStore: typeof boardStore;
   readonly heapStore: typeof heapStore;
@@ -114,21 +115,22 @@ export class QuadrelStore {
     window.clearInterval(this.timer);
     this.nowQuadrelCode = {
       shapeCode: this.getShapeCode(),
-      typeCode: this.getTypeCode(),
+      formCode: this.getFormCode(),
       colorCode: this.getColorCode(),
     };
     this.nextQuadrelCode = {
       shapeCode: this.getShapeCode(),
-      typeCode: this.getTypeCode(),
+      formCode: this.getFormCode(),
       colorCode: this.getColorCode(),
     };
     this.fallPoint = {
       x: boardStore.col / 2 - 1,
-      y: -this.nowQuadrelsType.reduce<number>((prev, curr) => prev > curr.y ? prev : curr.y, 0) - 1,
+      y: -this.nowQuadrelsForm.reduce<number>((prev, curr) => prev > curr.y ? prev : curr.y, 0) - 1,
     }
     this.pause = true;
     this.rate = 0;
     this.up = 0;
+    this.show = false;
     this.heapStore.onRestart();
   }
 
@@ -144,14 +146,14 @@ export class QuadrelStore {
     }  
   }
 
-  @action onChangeType() {
+  @action onChangeForm() {
     if (!this.pause && !this.heapStore.gameover) {
-      let code = this.nowQuadrelCode.typeCode + 1;
+      let code = this.nowQuadrelCode.formCode + 1;
       code = code > 3 ? 0 : code;
-      const quadrelType = this.shapes[this.nowQuadrelCode.shapeCode][code];
-      const newPoint = this.canChangeType(this.fallPoint, quadrelType);
+      const quadrelForm = this.shapes[this.nowQuadrelCode.shapeCode][code];
+      const newPoint = this.canChangeForm(this.fallPoint, quadrelForm);
       if (newPoint) {
-        this.nowQuadrelCode.typeCode = code;
+        this.nowQuadrelCode.formCode = code;
         this.fallPoint = newPoint;
       }
     }  
@@ -160,7 +162,7 @@ export class QuadrelStore {
   @action onLeft() {
     if (!this.pause && !this.heapStore.gameover) {
       const newPoint = { x: this.fallPoint.x - 1, y: this.fallPoint.y };
-      if (this.testQuadrelsType(newPoint, this.nowQuadrelsType)) {
+      if (this.testQuadrelsForm(newPoint, this.nowQuadrelsForm)) {
         this.fallPoint = newPoint;
       }
     }
@@ -169,7 +171,7 @@ export class QuadrelStore {
   @action onRight() {
     if (!this.pause && !this.heapStore.gameover) {
       const newPoint = { x: this.fallPoint.x + 1, y: this.fallPoint.y };
-      if (this.testQuadrelsType(newPoint, this.nowQuadrelsType)) {
+      if (this.testQuadrelsForm(newPoint, this.nowQuadrelsForm)) {
         this.fallPoint = newPoint;
       }
     }
@@ -188,22 +190,23 @@ export class QuadrelStore {
     if (this.rate > this.full) {
       this.rate = 0;
       const newPoint = { x: this.fallPoint.x, y: this.fallPoint.y + 1 };
-      if (this.testQuadrelsType(newPoint, this.nowQuadrelsType)) {
+      if (this.testQuadrelsForm(newPoint, this.nowQuadrelsForm)) {
         this.fallPoint = newPoint;
+        this.show = true;
       } else {
-        const nowQuadrels = this.nowQuadrels;
-        if (this.heapStore.onAddQuadrels(nowQuadrels)) {
+        if (this.heapStore.onAddQuadrels(this.nowQuadrels)) {
           this.nowQuadrelCode = this.nextQuadrelCode;
           this.nextQuadrelCode = {
             shapeCode: this.getShapeCode(),
-            typeCode: this.getTypeCode(),
+            formCode: this.getFormCode(),
             colorCode: this.getColorCode(),
           };
           this.fallPoint = {
             x: boardStore.col / 2 - 1,
-            y: -this.nowQuadrelsType.reduce<number>((prev, curr) => prev > curr.y ? prev : curr.y, 0) - 1,
-          }
+            y: -this.nowQuadrelsForm.reduce<number>((prev, curr) => prev > curr.y ? prev : curr.y, 0) - 1,
+          };
           this.up = 0;
+          this.show = false;
         } else {
           this.pause = true;
           this.rate = 0;
@@ -214,22 +217,22 @@ export class QuadrelStore {
     }  
   }
 
-  @computed get nowQuadrelsType() {
-    const { shapeCode, typeCode } = this.nowQuadrelCode;
-    return this.shapes[shapeCode][typeCode];
+  @computed get nowQuadrelsForm() {
+    const { shapeCode, formCode } = this.nowQuadrelCode;
+    return this.shapes[shapeCode][formCode];
   }
 
   @computed get nowQuadrels() {
-    const { shapeCode, typeCode, colorCode } = this.nowQuadrelCode;
-    const color = this.colors[colorCode];
+    const { shapeCode, formCode, colorCode } = this.nowQuadrelCode;
     const { x, y } = this.fallPoint;
-    return this.shapes[shapeCode][typeCode].map<Quadrel>(p => ({ point: { x: p.x + x, y: p.y + y }, color }));
+    const color = this.colors[colorCode];
+    return this.shapes[shapeCode][formCode].map<Quadrel>(p => ({ point: { x: p.x + x, y: p.y + y }, color }));
   }
 
   @computed get nextQuadrels() {
-    const { shapeCode, typeCode, colorCode } = this.nextQuadrelCode;
+    const { shapeCode, formCode, colorCode } = this.nextQuadrelCode;
     const color = this.colors[colorCode];
-    return this.shapes[shapeCode][typeCode].map<Quadrel>(point => ({ point, color }));
+    return this.shapes[shapeCode][formCode].map<Quadrel>(point => ({ point, color }));
   }
 
   randomInt(min: number, max: number) {
@@ -243,7 +246,7 @@ export class QuadrelStore {
     return code;
   }
 
-  getTypeCode(code?: number) {
+  getFormCode(code?: number) {
     if (code === undefined || (code < 0 && code >= 4)) {
       return this.randomInt(0, 3)
     }
@@ -257,30 +260,30 @@ export class QuadrelStore {
     return code;
   }
 
-  getRealQuadrelsType(fallPoint: Point, quadrelsType: Point[]): Point[] {
-    return quadrelsType.map(p => ({ x: p.x + fallPoint.x, y: p.y + fallPoint.y }));
+  getRealQuadrelsForm(fallPoint: Point, quadrelsForm: Point[]): Point[] {
+    return quadrelsForm.map(p => ({ x: p.x + fallPoint.x, y: p.y + fallPoint.y }));
   }
 
   includeHeap(point: Point) {
     return this.heapStore.heap.some(({ point: { x, y } }) => point.x === x && point.y === y);
   }
 
-  testQuadrelsType(fallPoint: Point, quadrelsType: Point[]) {
-    return this.getRealQuadrelsType(fallPoint, quadrelsType).every(point => !this.includeHeap(point) && point.x >= 0 && point.x < this.boardStore.col && point.y < this.boardStore.row)
+  testQuadrelsForm(fallPoint: Point, quadrelsForm: Point[]) {
+    return this.getRealQuadrelsForm(fallPoint, quadrelsForm).every(point => !this.includeHeap(point) && point.x >= 0 && point.x < this.boardStore.col && point.y < this.boardStore.row)
   }
 
-  canChangeType(fallPoint: Point, quadrelsType: Point[]): Point | null {
-    if (this.testQuadrelsType(fallPoint, quadrelsType)) {
+  canChangeForm(fallPoint: Point, quadrelsForm: Point[]): Point | null {
+    if (this.testQuadrelsForm(fallPoint, quadrelsForm)) {
       return fallPoint;
     }
     const { x, y } = fallPoint;
-    const farLeftX = quadrelsType.reduce<number>((prev, curr) => prev < curr.x ? prev : curr.x, 0);
-    const farLeftPoints = quadrelsType.filter(point => point.x === farLeftX);
+    const farLeftX = quadrelsForm.reduce<number>((prev, curr) => prev < curr.x ? prev : curr.x, 0);
+    const farLeftPoints = quadrelsForm.filter(point => point.x === farLeftX);
     let leftX = x;
     let i = 3;
     while (i-- > 0) {
       leftX--;
-      if (this.testQuadrelsType({ x: leftX, y }, quadrelsType)) {
+      if (this.testQuadrelsForm({ x: leftX, y }, quadrelsForm)) {
         return { x: leftX, y };
       }
       if (farLeftPoints.some(point => this.includeHeap({ x: point.x + leftX, y: point.y + y }))) {
@@ -288,12 +291,12 @@ export class QuadrelStore {
       }
     }
     let rightX = x;
-    const farRightX = quadrelsType.reduce<number>((prev, curr) => prev > curr.x ? prev : curr.x, 0);
-    const farRightPoints = quadrelsType.filter(point => point.x === farRightX);
+    const farRightX = quadrelsForm.reduce<number>((prev, curr) => prev > curr.x ? prev : curr.x, 0);
+    const farRightPoints = quadrelsForm.filter(point => point.x === farRightX);
     i = 3;
     while (i-- > 0) {
       rightX++;
-      if (this.testQuadrelsType({ x: rightX, y }, quadrelsType)) {
+      if (this.testQuadrelsForm({ x: rightX, y }, quadrelsForm)) {
         return { x: rightX, y };
       }
       if (farRightPoints.some(point => this.includeHeap({ x: point.x + rightX, y: point.y + y }))) {

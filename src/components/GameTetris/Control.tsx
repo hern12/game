@@ -1,7 +1,7 @@
+import React from 'react';
+import { inject, observer } from 'mobx-react';
 import Button from '@material-ui/core/Button';
 import Switch from '@material-ui/core/Switch';
-import { inject, observer } from 'mobx-react';
-import * as React from 'react';
 import { WithQuadrelStore } from './stores';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 
@@ -53,7 +53,7 @@ class Control extends React.Component<ControlPropsWithStore> {
   handleKeydown = (e: KeyboardEvent) => {
     switch (e.keyCode) {
       case KEY.SPACE:
-        this.props.quadrelStore!.onChangeType();
+        this.props.quadrelStore!.onChangeForm();
         e.preventDefault();
         break;
       case KEY.LEFT:
@@ -160,7 +160,7 @@ class Control extends React.Component<ControlPropsWithStore> {
         />
         <br />
         <Button
-          variant="raised"
+          variant="contained"
           color="primary"
           style={{ margin: gup }}
           onClick={this.handleNewGame}

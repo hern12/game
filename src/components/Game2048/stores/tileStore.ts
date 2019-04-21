@@ -95,7 +95,7 @@ class TileMatrix extends Matrix<Tile | null> {
     const emptyPosition = emptyPositions[Math.random() * length | 0];
     const { row, col } = emptyPosition;
     this.value[row][col] = {
-      value: Math.random() > 0.5 ? 2 : 4,
+      value: Math.random() > 0.1 ? 2 : 4,
       row,
       col,
     };
