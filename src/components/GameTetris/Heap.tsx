@@ -36,7 +36,7 @@ class Heap extends React.Component<HeapPropsWithStore> {
           fillStyle={grey50}
         />
         <Text
-          text={score.toString()}
+          text={score}
           x={width + length}
           y={top + 16 + 4 * gup}
           font="16px"
@@ -49,7 +49,7 @@ class Heap extends React.Component<HeapPropsWithStore> {
           fillStyle={grey50}
         />
         <Text
-          text={bestScore.toString()}
+          text={bestScore}
           x={width + length}
           y={top + 48 + 8 * gup}
           fillStyle={red400}

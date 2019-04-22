@@ -52,7 +52,7 @@ class Tile extends React.Component<TilePropsWithStore> {
           fillStyle={grey50}
         />
         <Text
-          text={score.toString()}
+          text={score}
           x={width + gup}
           y={16 + 2 * gup}
           fillStyle={red400}
@@ -64,7 +64,7 @@ class Tile extends React.Component<TilePropsWithStore> {
           fillStyle={grey50}
         />
         <Text
-          text={bestScore.toString()}
+          text={bestScore}
           x={width + gup}
           y={48 + 4 * gup}
           fillStyle={red400}
@@ -90,9 +90,7 @@ class Tile extends React.Component<TilePropsWithStore> {
             fillStyle={colors[value]}
           >
             <Text
-              text={value.toString()}
-              x={col * length + gup + size / 2}
-              y={row * length + gup + size / 2}
+              text={value}
               fontSize={32}
               textAlign="center"
               textBaseline="middle"

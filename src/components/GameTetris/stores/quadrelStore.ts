@@ -177,8 +177,8 @@ export class QuadrelStore {
     }
   }
 
-  @action onSpeedUp() {
-    this.up += 10;
+  @action onSpeedUp(up?: number) {
+    this.up += up || 10;
   }
 
   @action onSpeedRecover() {
@@ -205,7 +205,6 @@ export class QuadrelStore {
             x: boardStore.col / 2 - 1,
             y: -this.nowQuadrelsForm.reduce<number>((prev, curr) => prev > curr.y ? prev : curr.y, 0) - 1,
           };
-          this.up = 0;
           this.show = false;
         } else {
           this.pause = true;

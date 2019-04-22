@@ -36,3 +36,19 @@ export default function App() {
     </>
   );
 }
+
+// import React from 'react'
+// import Canvas from './components/Canvas';
+
+// export default function App() {
+//   return (
+//     <Canvas width={500} height={500}>
+//       <Canvas.Rect w={500} h={500} fillStyle="#fff">
+//         <Canvas.Rect x={100} y={100} w={300} h={300} fillStyle="#000" textAlign="center" fontWeight="bolder" textBaseline="middle" fontFillStyle="#f00">
+//           My is Text.
+//           <Canvas.Text text="My." fontFillStyle="#fff" />
+//         </Canvas.Rect>
+//       </Canvas.Rect>
+//     </Canvas>
+//   );
+// }

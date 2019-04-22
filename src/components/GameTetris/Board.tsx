@@ -31,7 +31,6 @@ class Board extends React.Component<BoardPropsWithStore> {
             y={y * length + gup}
             w={size}
             h={size}
-            r={gup / 2}
             fillStyle={brown[100]}
           />
         );
@@ -40,14 +39,7 @@ class Board extends React.Component<BoardPropsWithStore> {
 
     return (
       <Canvas className={className} width={newWidth} height={height}>
-        <Rect
-          x={0}
-          y={0}
-          w={width}
-          h={height}
-          r={gup}
-          fillStyle={brown[200]}
-        />
+        <Rect w={width} h={height} fillStyle={brown[200]} />
         {tiles}
       </Canvas>
     );

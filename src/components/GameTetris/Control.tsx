@@ -8,11 +8,13 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 const KEY = {
   SPACE: 32,
   LEFT: 37,
+  UP: 38,
   RIGHT: 39,
   DOWN: 40,
   A: 65,
   S: 83,
   D: 68,
+  W: 87,
   P: 80,
   N: 78,
 };
@@ -32,6 +34,7 @@ class Control extends React.Component<ControlPropsWithStore> {
   private rightKeyPress = false;
   private downTimer: number;
   private downKeyPress = false;
+  private spaceKeyPress = false;
 
   constructor(props: ControlPropsWithStore) {
     super(props);
@@ -52,7 +55,7 @@ class Control extends React.Component<ControlPropsWithStore> {
 
   handleKeydown = (e: KeyboardEvent) => {
     switch (e.keyCode) {
-      case KEY.SPACE:
+      case KEY.UP:
         this.props.quadrelStore!.onChangeForm();
         e.preventDefault();
         break;
@@ -100,6 +103,13 @@ class Control extends React.Component<ControlPropsWithStore> {
         }
         e.preventDefault();
         break;
+      case KEY.SPACE:
+        if (!this.spaceKeyPress) {
+          this.spaceKeyPress = true;
+          this.props.quadrelStore!.onSpeedUp(100);
+        }
+        e.preventDefault();
+        break;
       case KEY.P:
         this.handlePause();
         e.preventDefault();
@@ -129,6 +139,11 @@ class Control extends React.Component<ControlPropsWithStore> {
       case KEY.S:
         window.clearInterval(this.downTimer);
         this.downKeyPress = false;
+        this.props.quadrelStore!.onSpeedRecover();
+        e.preventDefault();
+        break;
+      case KEY.SPACE:
+        this.spaceKeyPress = false;
         this.props.quadrelStore!.onSpeedRecover();
         e.preventDefault();
         break;
