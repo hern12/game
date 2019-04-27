@@ -8,54 +8,46 @@ export type Position = {
 
 class Matrix<T> {
   value: T[][];
+  size: number;
 
-  readonly size: number;
-
-  constructor(size: number) {
-    const value: T[][] = [];
-    let i = size;
-    while (i-- > 0) {
-      value.push(Array(size).fill(null));
-    }
-    this.value = value;
+  constructor(size: number)
+  constructor(likeMatrix: T[][])
+  constructor(arg: number | T[][]) {
+    const argIsN = typeof arg === 'number';
+    const size = argIsN ? (arg as number) : (arg as T[][]).length;
     this.size = size;
+    this.value = [];
+    for (let row = 0; row < size; row++) {
+      const cols: T[] = [];
+      for (let col = 0; col < size; col++) {
+        cols[col]  = argIsN ? null : arg[row][col];
+      }
+      this.value[row] = cols;
+    }
   }
 
   get emptyPositions(): Position[] {
     const positions: Position[] = [];
-    this.value.forEach((eachRow, row) => {
-      eachRow.forEach((eachValue, col) => {
-        if (eachValue === null) {
-          positions.push({ row, col });
-        }
-      });
-    });
+    this.value.forEach((eachRow, row) => eachRow.forEach((eachValue, col) => {
+      if (eachValue === null) positions[positions.length] = { row, col };
+    }));
     return positions;
   }
 
   transposeMatrix(): void {
-    const value = new Matrix<T>(this.size).value;
+    const origin = new Matrix<T>(this.value);
     this.value.forEach((eachRow, row) => eachRow.forEach((eachValue, column) => {
-      value[column][row] = this.value[row][column];
+      this.value[column][row] = origin.value[row][column];
     }));
-    this.value = value;
   }
 
   isEqual(matrix: Matrix<T>, assert = (own: T, its: T) => own !== its): boolean {
-    try {
-      const { size, value } = matrix;
-      if (this.size !== size) {
-        return false;
+    const size = matrix.size;
+    if (this.size !== size) return false;
+    for (let row = 0; row < size; row++) {
+      for (let col = 0; col < size; col++) {
+        if (assert(this.value[row][col], matrix.value[row][col])) return false;
       }
-      for (let row = 0; row < size; row++) {
-        for (let column = 0; column < size; column++) {
-          if (assert(this.value[row][column], value[row][column])) {
-            return false;
-          }
-        }
-      }
-    } catch (e) {
-      return false;
     }
     return true;
   }
@@ -68,47 +60,35 @@ export type Tile = {
 };
 
 class TileMatrix extends Matrix<Tile | null> {
-
   constructor(size: number, tiles: Tile[] = []) {
     super(size);
-    tiles.forEach((tile) => {
+    tiles.forEach(tile => {
       this.value[tile.row][tile.col] = tile;
     });
   }
 
   get tiles(): Tile[] {
-    const tiles: Tile[] = [];
+    const result: Tile[] = [];
     this.value.forEach((eachRow, row) => eachRow.forEach((eachValue, col) => {
-      if (eachValue !== null) {
-        tiles.push({ ...eachValue, row, col });
-      }
+      if (eachValue !== null) result[result.length] = { ...eachValue, row, col };
     }));
-    return tiles;
+    return result;
   }
 
   addTile(): boolean {
     const emptyPositions = this.emptyPositions;
     const length = emptyPositions.length;
-    if (!length) {
-      return false;
-    }
+    if (!length) return false;
     const emptyPosition = emptyPositions[Math.random() * length | 0];
     const { row, col } = emptyPosition;
-    this.value[row][col] = {
-      value: Math.random() > 0.1 ? 2 : 4,
-      row,
-      col,
-    };
+    this.value[row][col] = { row, col, value: Math.random() > 0.1 ? 2 : 4 };
     return true;
   }
 
   isEqual(tileMatrix: TileMatrix): boolean {
     return super.isEqual(tileMatrix, (own, its) => {
-      if (own !== null && its !== null) {
-        return own.value !== its.value;
-      } else {
-        return own !== its;
-      }
+      if (own !== null && its !== null) return own.value !== its.value;
+      else return true;
     });
   }
 
@@ -130,7 +110,7 @@ class TileMatrix extends Matrix<Tile | null> {
     let head = 0;
     let tail = length - 1;
     let prevValue = NaN;
-    row.forEach((eachValue, index) => {
+    row.forEach(eachValue => {
       if (eachValue !== null) {
         if (prevValue === eachValue.value) {
           getScore(eachValue.value * 2);
@@ -191,9 +171,7 @@ class TileStore implements Move {
   @action onRestart({ initCount = 2, score = 0, bestScore = this.bestScore }: MatrixStoreRestartOptions = {}) {
     const tileMatrix = new TileMatrix(this.size);
     while (initCount-- > 0) {
-      if (!tileMatrix.addTile()) {
-        break;
-      }
+      if (!tileMatrix.addTile()) break;
     }
     this.tileMatrix = tileMatrix;
     this.score = score;
@@ -201,7 +179,7 @@ class TileStore implements Move {
     this.gameover = false;
   }
 
-  @action onMove({ tileMatrix, isRemovable, direction, score }: TileMove) {
+  @action onMove({ tileMatrix, isRemovable, score }: TileMove) {
     if (isRemovable) {
       this.tileMatrix = tileMatrix;
       this.score += score;
@@ -212,9 +190,7 @@ class TileStore implements Move {
   }
 
   @action.bound addValue() {
-    if (!this.gameover) {
-      this.tileMatrix.addTile();
-    }
+    if (!this.gameover) this.tileMatrix.addTile();
   }
 
   @computed get tiles(): Tile[] {
