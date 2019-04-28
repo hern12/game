@@ -31,7 +31,7 @@ export interface CanvasBaseProps extends CanvasStyles {
 //   }, {} as Pick<T, K>);
 // }
 
-const _styles: CanvasStyles = {
+const STYLES: CanvasStyles = {
   fillStyle: 'rgba(0, 0, 0, 0)',
   strokeStyle: 'rgba(0, 0, 0, 0)',
   lineWidth: 0,
@@ -45,7 +45,7 @@ const _styles: CanvasStyles = {
 };
 
 function setCanvasStyles(ctx: CanvasRenderingContext2D, styles: CanvasStyles) {
-  styles.font = styles.font || `${styles.fontStyle || _styles.fontStyle} ${styles.fontVariant || _styles.fontVariant} ${styles.fontWeight || _styles.fontWeight} ${styles.fontSize || _styles.fontSize}px ${styles.fontFamily || _styles.fontFamily}`;
+  styles.font = styles.font || `${styles.fontStyle || STYLES.fontStyle} ${styles.fontVariant || STYLES.fontVariant} ${styles.fontWeight || STYLES.fontWeight} ${styles.fontSize || STYLES.fontSize}px ${styles.fontFamily || STYLES.fontFamily}`;
   Object.keys(styles).forEach(key => {
     if (key in ctx && styles[key]) ctx[key] = styles[key];
   });
@@ -80,19 +80,41 @@ function isCanvasElement<P extends CanvasBaseProps>(node: CanvasNode): node is C
   return React.isValidElement(node) && !!node.type.callName;
 }
 
+function isLayoutElement(node: CanvasElement): node is CanvasElement<LayoutProps> {
+  return node.type.callName === 'Layout';
+}
+
+function isTextElement(node: CanvasElement): node is CanvasElement<TextProps> {
+  return node.type.callName === 'Text';
+}
+
 function draw(ctx: CanvasRenderingContext2D, children: CanvasNode, parentProps: CanvasBaseProps) {
-  if (!children) return;
   React.Children.forEach(children, child => {
     if (isCanvasElement(child)) {
-      const props = { ...parentProps, ...child.props };
-      const callName = child.type.callName;
-      props.x = (parentProps.x || 0) + (child.props.x || 0);
-      props.y = (parentProps.y || 0) + (child.props.y || 0);
-      if (callName === 'Text') {
-        draw(ctx, isCanvasText((props as TextProps).text) ? (props as TextProps).text : props.children, props);
+      const mergedProps = { ...parentProps, ...child.props };
+      mergedProps.x = parentProps.x! + (child.props.x || 0);
+      mergedProps.y = parentProps.y! + (child.props.y || 0);
+      if (isLayoutElement(child)) {
+        if (child.props.column) {
+          let dx = 0;
+          React.Children.forEach(child.props.children, _child => {
+            mergedProps.x! += dx;
+            dx = (_child.props.x || 0) + (_child.props.w || 0);
+            draw(ctx, _child, mergedProps);
+          });
+        } else {
+          let dy = 0;
+          React.Children.forEach(child.props.children, _child => {
+            mergedProps.y! += dy;
+            dy = (_child.props.y || 0) + (_child.props.h || 0);
+            draw(ctx, _child, mergedProps);
+          });
+        }
+      } else if (isTextElement(child)) {
+        draw(ctx, isCanvasText(child.props.text) ? child.props.text : child.props.children, mergedProps);
       } else {
-        Canvas[callName].call(ctx, props);
-        draw(ctx, child.props.children, props);
+        Canvas[child.type.callName].call(ctx, mergedProps);
+        draw(ctx, child.props.children, mergedProps);
       }
     } else if (isCanvasText(child)) {
       const props = { ...parentProps, text: child };
@@ -117,7 +139,7 @@ function Canvas(props: CanvasProps) {
 
   useEffect(() => {
     const ctx = getCtx();
-    if (ctx) setCanvasStyles(ctx, { ..._styles, ...canvasStyles });
+    if (ctx) setCanvasStyles(ctx, { ...STYLES, ...canvasStyles });
   }, [canvasStyles]);
 
   useEffect(() => {
@@ -125,13 +147,25 @@ function Canvas(props: CanvasProps) {
     if (ctx) {
       const w = ctx.canvas.width;
       const h = ctx.canvas.height;
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.clearRect(0, 0, w, h);
       draw(ctx, children, { x: 0, y: 0, w, h });
     }
   });
-
   return <canvas ref={canvasRef} {...other} />;
 }
+
+
+export interface LayoutProps extends CanvasBaseProps {
+  children: CanvasElement | CanvasElement[];
+  column?: boolean;
+}
+
+export function Layout(this: CanvasRenderingContext2D, props: LayoutProps) {
+  return null;
+}
+
+Layout.callName = 'Layout';
+Canvas.Layout = Layout;
 
 export interface RectProps extends CanvasBaseProps {
   children?: CanvasNode;
@@ -155,7 +189,7 @@ export function Rect(this: CanvasRenderingContext2D, props: RectProps) {
   }
   ctx.closePath();
   ctx.fill();
-  ctx.stroke();
+  if(styles.lineWidth) ctx.stroke();
   ctx.restore();
   return null;
 };
@@ -176,7 +210,7 @@ export function Text(this: CanvasRenderingContext2D, props: TextProps) {
   ctx.save();
   setCanvasStyles(ctx, styles);
   ctx.fillText(txt, x, y, maxWidth);
-  ctx.strokeText(txt, x, y, maxWidth);
+  if (styles.lineWidth) ctx.strokeText(txt, x, y, maxWidth);
   ctx.restore();
   return null;
 }
