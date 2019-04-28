@@ -16,8 +16,8 @@ export default class TileMatrix extends Matrix<Tile | null> {
 
   get tiles(): Tile[] {
     const result: Tile[] = [];
-    this.value.forEach((eachRow, row) => eachRow.forEach((eachValue, col) => {
-      if (eachValue !== null) result[result.length] = { ...eachValue, y: row, x: col };
+    this.value.forEach((eachRow, y) => eachRow.forEach((eachValue, x) => {
+      if (eachValue !== null) result[result.length] = { ...eachValue, y, x };
     }));
     return result;
   }
@@ -27,27 +27,27 @@ export default class TileMatrix extends Matrix<Tile | null> {
     const length = emptyPositions.length;
     if (!length) return false;
     const emptyPosition = emptyPositions[Math.random() * length | 0];
-    const { row, col } = emptyPosition;
-    this.value[row][col] = { y: row, x: col, value: Math.random() > 0.1 ? 2 : 4 };
+    const { x, y } = emptyPosition;
+    this.value[y][x] = { y, x, value: Math.random() > 0.1 ? 2 : 4 };
     return true;
   }
 
   isEqual(tileMatrix: TileMatrix): boolean {
     return super.isEqual(tileMatrix, (own, its) => {
       if (own !== null && its !== null) return own.value !== its.value;
-      else return true;
+      return own !== its;
     });
   }
 
   moveToFront(getScore: (score: number) => void): void {
-    this.value.forEach((eachRow, row) => {
-      this.value[row] = this.moveRowToFront(eachRow, getScore);
+    this.value.forEach((eachRow, y) => {
+      this.value[y] = this.moveRowToFront(eachRow, getScore);
     });
   }
 
   moveToBack(getScore: (score: number) => void): void {
-    this.value.forEach((eachRow, row) => {
-      this.value[row] = this.moveRowToBack(eachRow, getScore);
+    this.value.forEach((eachRow, y) => {
+      this.value[y] = this.moveRowToBack(eachRow, getScore);
     });
   }
 
