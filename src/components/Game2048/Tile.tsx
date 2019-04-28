@@ -79,11 +79,11 @@ class Tile extends React.Component<TilePropsWithStore> {
             fillStyle={red400}
           />
         )}
-        {tiles.map(({ value, row, col }, i) => (
+        {tiles.map(({ x, y, value }, i) => (
           <Rect
             key={'tile' + i}
-            x={col * length + gup}
-            y={row * length + gup}
+            x={x * length + gup}
+            y={y * length + gup}
             w={size}
             h={size}
             r={gup / 2}
