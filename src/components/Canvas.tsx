@@ -154,7 +154,6 @@ function Canvas(props: CanvasProps) {
   return <canvas ref={canvasRef} {...other} />;
 }
 
-
 export interface LayoutProps extends CanvasBaseProps {
   children: CanvasElement | CanvasElement[];
   column?: boolean;

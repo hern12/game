@@ -1,9 +1,9 @@
 import Matrix from './Matrix';
 
 export interface Tile {
+  value: number;
   x: number;
   y: number;
-  value: number;
 }
 
 export default class TileMatrix extends Matrix<Tile | null> {

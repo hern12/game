@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react'
-import { easing, EasingNames } from '../easing';
+import { easing, EasingNames } from 'easing';
 
 function useAnimationTimer(duration: number, delay: number) {
   const [elapsed, setTime] = useState(0);
 
   useEffect(() => {
-    let animationFrame: number;
-    let timerStop: number;
-    let start: number;
+    let animationFrame: number, timerStop: number, start: number;
 
     function onFrame() {
       setTime(Date.now() - start);

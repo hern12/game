@@ -1,5 +1,6 @@
-import { Tile } from './TileMatrix';
+import TileMatrix, { Tile } from './TileMatrix';
 
+export const ADD_TILE = 'ADD_TILE';
 export const LEFT = 'LEFT';
 export const DOWN = 'DOWN';
 export const RIGHT = 'RIGHT';
@@ -17,18 +18,25 @@ export interface InitialState {
 }
 
 export interface State extends InitialState {
+  tileMatrix: TileMatrix;
   cellLength: number;
   left: TileMove;
   right: TileMove;
   up: TileMove;
   down: TileMove;
   gameover: boolean;
+  lock: boolean;
 }
 
 export interface TileMove {
   isRemovable: boolean;
   score: number;
-  tiles: Tile[];
+  tileMatrix: TileMatrix;
+}
+
+interface AddTileAction {
+  type: typeof ADD_TILE;
+  addCount: number;
 }
 
 interface LeftAction {
@@ -58,6 +66,7 @@ interface InitiAction {
 }
 
 export type ActionTypes =
+  | AddTileAction
   | LeftAction
   | DownAction
   | RightAction

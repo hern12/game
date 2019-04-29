@@ -1,18 +1,22 @@
-import { LEFT, DOWN, RIGHT, UP, SET_BOARD_LENGTH, INITI, InitialState, ActionTypes } from './types';
+import { ADD_TILE, LEFT, DOWN, RIGHT, UP, SET_BOARD_LENGTH, INITI, InitialState, ActionTypes } from './types';
 
-export function left(): ActionTypes {
+export function addTile(addCount = 1): ActionTypes {
+  return { type: ADD_TILE, addCount };
+}
+
+export function moveLeft(): ActionTypes {
   return { type: LEFT };
 }
 
-export function down(): ActionTypes {
+export function moveDown(): ActionTypes {
   return { type: DOWN };
 }
 
-export function right(): ActionTypes {
+export function moveRight(): ActionTypes {
   return { type: RIGHT };
 }
 
-export function up(): ActionTypes {
+export function moveUp(): ActionTypes {
   return { type: UP };
 }
 

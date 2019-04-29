@@ -1,9 +1,10 @@
-import React, { useReducer, useMemo, useCallback, useEffect } from 'react';
+import React, { useReducer, useRef, useMemo, useCallback, useEffect } from 'react';
 import Canvas, { Layout, Rect, Text } from '../Canvas';
 import { InitialState } from './store/types';
-import { left, down, right, up, setBoardLength, init } from './store/actions';
+import { addTile, moveLeft, moveDown, moveRight, moveUp, setBoardLength, init } from './store/actions';
 import { reducer, initState } from './store/reducer';
 import { Tile } from './store/TileMatrix';
+import { utils } from 'utils';
 // import clsx from 'clsx';
 
 const COLORS = {
@@ -42,6 +43,7 @@ const FONTSIZES = {
 const MAX = 640;
 const MIN = 320;
 const SCORE_HEIGHT = 64;
+// const FRAME_TIME = 16.7;
 
 const KEY = {
   LEFT: 37,
@@ -133,52 +135,72 @@ function getTileCells(tiles: Tile[], gup: number, cellLength: number, isLarger: 
 
 export default function Game2048() {
   const [state, dispatch] = useReducer(reducer, getInitialState(), initState);
-  const { size, gup, boardLength, cellLength, score, best, tiles, gameover } = state;
+  const { size, gup, boardLength, cellLength, score, best, tiles, left, down, right, up, gameover, lock } = state;
+  const timerRef = useRef<number>();
   const isLarger = boardLength > ((MAX + MIN) / 2) - gup;
-  const scoreLayout = useMemo(() => getScoreLayout(SCORE_HEIGHT, gup, boardLength, score, best, isLarger), [score, best, boardLength, gup, isLarger]);
-  const boardCells = useMemo(() => getBoardCells(size, gup, cellLength), [cellLength, gup, size]);
-  const tileCells = useMemo(() => getTileCells(tiles, gup, cellLength, isLarger), [tiles, cellLength, gup, isLarger]);
 
-  const handleNewGame = useCallback(() => dispatch(init({ size, gup, boardLength, best, score: 0, tiles: [] })), [dispatch, best, boardLength, size, gup]);
-  const handleLeft = useCallback(() => dispatch(left()), [dispatch]);
-  const handleDown = useCallback(() => dispatch(down()), [dispatch]);
-  const handleRight = useCallback(() => dispatch(right()), [dispatch]);
-  const handleUp = useCallback(() => dispatch(up()), [dispatch]);
+  const scoreLayout = useMemo(() => {
+    return getScoreLayout(SCORE_HEIGHT, gup, boardLength, score, best, isLarger)
+  }, [score, best, boardLength, gup, isLarger]);
+  const boardCells = useMemo(() => {
+    return getBoardCells(size, gup, cellLength)
+  }, [cellLength, gup, size]);
+  const tileCells = useMemo(() => {
+    return getTileCells(tiles, gup, cellLength, isLarger)
+  }, [tiles, cellLength, gup, isLarger]);
+
+  const handleAddTile = useCallback(() => {
+    window.clearTimeout(timerRef.current);
+    timerRef.current = window.setTimeout(() => dispatch(addTile()), 255);
+  }, [dispatch]);
+  const handleLeft = useCallback(() => {
+    if (!lock && left.isRemovable) {
+      dispatch(moveLeft());
+      handleAddTile();
+    }
+  }, [lock, left, dispatch]);
+  const handleDown = useCallback(() => {
+    if (!lock && down.isRemovable) {
+      dispatch(moveDown());
+      handleAddTile();
+    }
+  }, [lock, down, dispatch]);
+  const handleRight = useCallback(() => {
+    if (!lock && right.isRemovable) {
+      dispatch(moveRight());
+      handleAddTile();
+    }
+  }, [lock, right, dispatch]);
+  const handleUp = useCallback(() => {
+    if (!lock && up.isRemovable) {
+      dispatch(moveUp());
+      handleAddTile();
+    }
+  }, [lock, up, dispatch]);
+  const handleNewGame = useCallback(() => {
+    dispatch(init({ size, gup, boardLength, best, score: 0, tiles: [] }))
+  }, [best, boardLength, size, gup, dispatch]);
 
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
-      switch (e.keyCode) {
-        case KEY.LEFT:
-        case KEY.A:
-          dispatch(left());
-          e.preventDefault();
-          break;
-        case KEY.DOWN:
-        case KEY.S:
-          dispatch(down());
-          e.preventDefault();
-          break;
-        case KEY.RIGHT:
-        case KEY.D:
-          dispatch(right());
-          e.preventDefault();
-          break;
-        case KEY.UP:
-        case KEY.W:
-          dispatch(up());
-          e.preventDefault();
-          break;
-      }
+      utils.handleKey(e, [
+        [[KEY.LEFT, KEY.A], handleLeft],
+        [[KEY.DOWN, KEY.S], handleDown],
+        [[KEY.RIGHT, KEY.D], handleRight],
+        [[KEY.UP, KEY.W], handleUp]
+      ]);
     };
     window.addEventListener('keydown', handleKeydown);
     return () => window.removeEventListener('keydown', handleKeydown);
-  }, [dispatch]);
+  }, [handleLeft, handleDown, handleRight, handleUp, dispatch]);
 
   useEffect(() => {
     const handleResize = () => dispatch(setBoardLength(getBoardLength(gup, window.innerWidth)));
     window.addEventListener('resize', handleResize);
     return () => removeEventListener('resize', handleResize);
   }, [dispatch, gup]);
+
+  useEffect(() => () => window.clearTimeout(timerRef.current), [])
 
   return (
     <div className="center" style={{ width: boardLength }}>
@@ -216,18 +238,18 @@ export default function Game2048() {
         </div>
         <div className="arraw-group">
           <div>
-            <button className="btn" disabled={!state.up.isRemovable} onClick={handleUp}>
+            <button className="btn" disabled={lock || !up.isRemovable} onClick={handleUp}>
               <span className="iconfont">&#xe7ed;</span>
             </button>
           </div>
           <div>
-            <button className="btn" disabled={!state.left.isRemovable} onClick={handleLeft}>
+            <button className="btn" disabled={lock || !left.isRemovable} onClick={handleLeft}>
               <span className="iconfont">&#xe7ec;</span>
             </button>
-            <button className="btn" disabled={!state.down.isRemovable} onClick={handleDown}>
+            <button className="btn" disabled={lock || !down.isRemovable} onClick={handleDown}>
               <span className="iconfont">&#xe7ee;</span>
             </button>
-            <button className="btn" disabled={!state.right.isRemovable} onClick={handleRight}>
+            <button className="btn" disabled={lock || !right.isRemovable} onClick={handleRight}>
               <span className="iconfont">&#xe7eb;</span>
             </button>
           </div>

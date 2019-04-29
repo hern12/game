@@ -1,4 +1,5 @@
 import {
+  ADD_TILE,
   LEFT,
   DOWN,
   RIGHT,
@@ -10,7 +11,7 @@ import {
   State,
   TileMove
 } from './types';
-import TileMatrix, { Tile } from './TileMatrix';
+import TileMatrix from './TileMatrix';
 
 function getLeft(nowTileMatrix: TileMatrix): TileMove {
   const tileMatrix = new TileMatrix(nowTileMatrix.size, nowTileMatrix.tiles);
@@ -19,7 +20,7 @@ function getLeft(nowTileMatrix: TileMatrix): TileMove {
   return {
     isRemovable: !nowTileMatrix.isEqual(tileMatrix),
     score,
-    tiles: tileMatrix.tiles,
+    tileMatrix,
   };
 }
 
@@ -32,7 +33,7 @@ function getDown(nowTileMatrix: TileMatrix): TileMove {
   return {
     isRemovable: !nowTileMatrix.isEqual(tileMatrix),
     score,
-    tiles: tileMatrix.tiles,
+    tileMatrix,
   };
 }
 
@@ -43,7 +44,7 @@ function getRight(nowTileMatrix: TileMatrix): TileMove {
   return {
     isRemovable: !nowTileMatrix.isEqual(tileMatrix),
     score,
-    tiles: tileMatrix.tiles,
+    tileMatrix,
   };
 }
 
@@ -56,7 +57,7 @@ function getUp(nowTileMatrix: TileMatrix): TileMove {
   return {
     isRemovable: !nowTileMatrix.isEqual(tileMatrix),
     score,
-    tiles: tileMatrix.tiles,
+    tileMatrix,
   };
 }
 
@@ -65,9 +66,11 @@ function getGameover(tileMatrix: TileMatrix, left: TileMove, down: TileMove, rig
   return !(existEmpty || left.isRemovable || down.isRemovable || right.isRemovable || up.isRemovable);
 }
 
-function computeMove(size: number, tiles: Tile[], addCount = 1) {
-  const tileMatrix = new TileMatrix(size, tiles);
-  while (addCount-- > 0) tileMatrix.addTile();
+function getCellLength(boardLength: number, size: number, gup: number) {
+  return (boardLength - (size + 1) * gup) / size;
+}
+
+function computeTileMove(tileMatrix: TileMatrix) {
   const left = getLeft(tileMatrix);
   const down = getDown(tileMatrix);
   const right = getRight(tileMatrix);
@@ -79,16 +82,35 @@ function computeMove(size: number, tiles: Tile[], addCount = 1) {
     down,
     right,
     up,
-    gameover
+    gameover,
   };
 }
 
-function getCellLength(boardLength: number, size: number, gup: number) {
-  return (boardLength - (size + 1) * gup) / size;
+function computeTileMoved(state: State, tileMove: TileMove) {
+  const score = state.score + tileMove.score;
+  const best = score < state.best ? state.best : score;
+  return {
+    tileMatrix: tileMove.tileMatrix,
+    tiles: tileMove.tileMatrix.tiles,
+    score,
+    best,
+  };
+}
+
+function computeMoveAction(state: State, tileMove: TileMove) {
+  return {
+    ...state,
+    ...computeTileMoved(state, tileMove),
+    lock: true,
+  };
 }
 
 export function initState({ size, gup, boardLength, score, best, tiles }: InitialState): State {
-  const computed = computeMove(size, tiles, tiles.length > 0 ? 0 : 2);
+  const tileMatrix = new TileMatrix(size, tiles);
+  let addCount = tiles.length > 0 ? 0 : 2;
+  while (addCount-- > 0)
+    if (!tileMatrix.addTile()) break;
+  const computed = computeTileMove(tileMatrix);
   return {
     size,
     gup,
@@ -96,64 +118,31 @@ export function initState({ size, gup, boardLength, score, best, tiles }: Initia
     score,
     best,
     cellLength: getCellLength(boardLength, size, gup),
+    tileMatrix,
+    lock: false,
     ...computed,
   };
 }
 
 export function reducer(state: State, action: ActionTypes): State {
   switch (action.type) {
+    case ADD_TILE:
+      let addCount = action.addCount;
+      while (addCount-- > 0)
+        if (!state.tileMatrix.addTile()) break;
+      return {
+        ...state,
+        ...computeTileMove(state.tileMatrix),
+        lock: false,
+      };
     case LEFT:
-      if (state.left.isRemovable) {
-        const computed = computeMove(state.size, state.left.tiles);
-        const score = state.score + state.left.score;
-        const best = score < state.best ? state.best : score;
-        return {
-          ...state,
-          ...computed,
-          score,
-          best,
-        };
-      }
-      return state;
+      return computeMoveAction(state, state.left);
     case DOWN:
-      if (state.down.isRemovable) {
-        const computed = computeMove(state.size, state.down.tiles)
-        const score = state.score + state.down.score;
-        const best = score < state.best ? state.best : score;
-        return {
-          ...state,
-          ...computed,
-          score,
-          best,
-        };
-      }
-      return state;
+      return computeMoveAction(state, state.down);
     case RIGHT:
-      if (state.right.isRemovable) {
-        const computed = computeMove(state.size, state.right.tiles)
-        const score = state.score + state.right.score;
-        const best = score < state.best ? state.best : score;
-        return {
-          ...state,
-          ...computed,
-          score,
-          best,
-        };
-      }
-      return state;
+      return computeMoveAction(state, state.right);
     case UP:
-      if (state.up.isRemovable) {
-        const computed = computeMove(state.size, state.up.tiles)
-        const score = state.score + state.up.score;
-        const best = score < state.best ? state.best : score;
-        return {
-          ...state,
-          ...computed,
-          score,
-          best,
-        };
-      }
-      return state;
+      return computeMoveAction(state, state.up);
     case SET_BOARD_LENGTH:
       const boardLength = action.boardLength;
       return {
