@@ -12,5 +12,14 @@ export const utils = {
         return;
       }
     }
+  },
+  save(key: string, value: any) {
+    if (!window.localStorage) return false;
+    window.localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  },
+  load<T = any>(key: string): false | T {
+    if (!window.localStorage) return false;
+    return JSON.parse(window.localStorage.getItem(key)!);
   }
 };

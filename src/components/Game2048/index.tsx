@@ -1,8 +1,8 @@
 import React, { useReducer, useRef, useMemo, useCallback, useEffect } from 'react';
 import Canvas, { Layout, Rect, Text } from '../Canvas';
-import { InitialState } from './store/types';
-import { addTile, moveLeft, moveDown, moveRight, moveUp, setBoardLength, init } from './store/actions';
-import { reducer, initState } from './store/reducer';
+import { InitialState, HistoryState } from './store/types';
+import { addTile, moveLeft, moveDown, moveRight, moveUp, setBoardLength, init, undo } from './store/actions';
+import { reducer, initState, LOCAL_STORAGE_KEY } from './store/reducer';
 import { Tile } from './store/TileMatrix';
 import { utils } from 'utils';
 // import clsx from 'clsx';
@@ -60,14 +60,26 @@ function getBoardLength(gup: number, width: number) {
   return (width > MAX ? MAX : width < MIN ? MIN : width) - 2 * gup;
 }
 
-function getInitialState(width = window.innerWidth, size = 4, gup = 8, score = 0, best = 0, tiles: Tile[] = []): InitialState {
+function getInitialState(): InitialState {
+  const gup = 8,
+    history = utils.load<HistoryState[]>(LOCAL_STORAGE_KEY) || [];
+  let score = 0,
+    best = 0,
+    tiles: Tile[] = [];
+  if (history.length) {
+    const lastHistory = history[history.length - 1];
+    tiles = lastHistory.tiles;
+    score = lastHistory.score;
+    best = lastHistory.best;
+  }
   return {
-    size,
+    size: 4,
     gup,
-    boardLength: getBoardLength(gup, width),
+    boardLength: getBoardLength(gup, window.innerWidth),
     score,
     best,
     tiles,
+    history,
   };
 }
 
@@ -135,7 +147,8 @@ function getTileCells(tiles: Tile[], gup: number, cellLength: number, isLarger: 
 
 export default function Game2048() {
   const [state, dispatch] = useReducer(reducer, getInitialState(), initState);
-  const { size, gup, boardLength, cellLength, score, best, tiles, left, down, right, up, gameover, lock } = state;
+  const { size, gup, boardLength, cellLength, score, best, tiles, left, down, right, up, gameover, lock, history } = state;
+
   const timerRef = useRef<number>();
   const isLarger = boardLength > ((MAX + MIN) / 2) - gup;
 
@@ -177,8 +190,13 @@ export default function Game2048() {
       handleAddTile();
     }
   }, [lock, up, dispatch]);
+  const handleUndo = useCallback(() => {
+    if (!lock && history.length > 1) {
+      dispatch(undo());
+    }
+  }, [lock, history, dispatch]);
   const handleNewGame = useCallback(() => {
-    dispatch(init({ size, gup, boardLength, best, score: 0, tiles: [] }))
+    dispatch(init({ size, gup, boardLength, best, score: 0, tiles: [], history }));
   }, [best, boardLength, size, gup, dispatch]);
 
   useEffect(() => {
@@ -234,7 +252,7 @@ export default function Game2048() {
       <div className="control">
         <div className="btn-group">
           <button className="btn" onClick={handleNewGame}>New Game</button>
-          <button className="btn" disabled>Undo</button>
+          <button className="btn" onClick={handleUndo} disabled={lock || history.length <= 1}>Undo</button>
         </div>
         <div className="arraw-group">
           <div>

@@ -1,4 +1,4 @@
-import { ADD_TILE, LEFT, DOWN, RIGHT, UP, SET_BOARD_LENGTH, INITI, InitialState, ActionTypes } from './types';
+import { ADD_TILE, LEFT, DOWN, RIGHT, UP, SET_BOARD_LENGTH, INITI, InitialState, ActionTypes, UNDO } from './types';
 
 export function addTile(addCount = 1): ActionTypes {
   return { type: ADD_TILE, addCount };
@@ -26,4 +26,8 @@ export function setBoardLength(boardLength: number): ActionTypes {
 
 export function init(initialState: InitialState): ActionTypes {
   return { type: INITI, initialState };
+}
+
+export function undo(): ActionTypes {
+  return { type: UNDO };
 }

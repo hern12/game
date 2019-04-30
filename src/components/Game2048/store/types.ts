@@ -7,14 +7,19 @@ export const RIGHT = 'RIGHT';
 export const UP = 'UP';
 export const SET_BOARD_LENGTH = 'SET_BOARD_LENGTH';
 export const INITI = 'INITI';
+export const UNDO = 'UNDO';
 
-export interface InitialState {
-  size: number;
-  gup: number;
-  boardLength: number;
+export interface HistoryState {
   score: number;
   best: number;
   tiles: Tile[];
+}
+
+export interface InitialState extends HistoryState {
+  size: number;
+  gup: number;
+  boardLength: number;
+  history: HistoryState[];
 }
 
 export interface State extends InitialState {
@@ -65,6 +70,10 @@ interface InitiAction {
   initialState: InitialState;
 }
 
+interface UndoAction {
+  type: typeof UNDO;
+}
+
 export type ActionTypes =
   | AddTileAction
   | LeftAction
@@ -72,4 +81,5 @@ export type ActionTypes =
   | RightAction
   | UPAction
   | SetBoardLengthAction
-  | InitiAction;
+  | InitiAction
+  | UndoAction;

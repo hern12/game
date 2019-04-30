@@ -6,12 +6,17 @@ import {
   UP,
   SET_BOARD_LENGTH,
   INITI,
+  UNDO,
   ActionTypes,
   InitialState,
   State,
   TileMove
 } from './types';
 import TileMatrix from './TileMatrix';
+import { utils } from 'utils';
+
+export const LOCAL_STORAGE_KEY = 'GAME2048';
+const HISTORY_LIMIT = 10;
 
 function getLeft(nowTileMatrix: TileMatrix): TileMove {
   const tileMatrix = new TileMatrix(nowTileMatrix.size, nowTileMatrix.tiles);
@@ -105,11 +110,16 @@ function computeMoveAction(state: State, tileMove: TileMove) {
   };
 }
 
-export function initState({ size, gup, boardLength, score, best, tiles }: InitialState): State {
+export function initState({ size, gup, boardLength, score, best, tiles, history }: InitialState): State {
   const tileMatrix = new TileMatrix(size, tiles);
-  let addCount = tiles.length > 0 ? 0 : 2;
-  while (addCount-- > 0)
-    if (!tileMatrix.addTile()) break;
+  if(tiles.length === 0) {
+    let addCount = 2;
+    while (addCount-- > 0)
+      if (!tileMatrix.addTile()) break;
+    history[history.length] = { score, best, tiles: tileMatrix.tiles };
+    if (history.length > HISTORY_LIMIT) history.shift();
+    utils.save(LOCAL_STORAGE_KEY, history);
+  }
   const computed = computeTileMove(tileMatrix);
   return {
     size,
@@ -120,6 +130,7 @@ export function initState({ size, gup, boardLength, score, best, tiles }: Initia
     cellLength: getCellLength(boardLength, size, gup),
     tileMatrix,
     lock: false,
+    history,
     ...computed,
   };
 }
@@ -130,11 +141,15 @@ export function reducer(state: State, action: ActionTypes): State {
       let addCount = action.addCount;
       while (addCount-- > 0)
         if (!state.tileMatrix.addTile()) break;
-      return {
+      const newState = {
         ...state,
         ...computeTileMove(state.tileMatrix),
         lock: false,
       };
+      newState.history[newState.history.length] = { score: newState.score, best: newState.best, tiles: [...newState.tiles] };
+      if (newState.history.length > HISTORY_LIMIT) newState.history.shift();
+      utils.save(LOCAL_STORAGE_KEY, state.history);
+      return newState;
     case LEFT:
       return computeMoveAction(state, state.left);
     case DOWN:
@@ -152,6 +167,11 @@ export function reducer(state: State, action: ActionTypes): State {
       };
     case INITI:
       return initState(action.initialState);
+    case UNDO:
+      state.history.pop();
+      utils.save(LOCAL_STORAGE_KEY, state.history);
+      const prev = state.history[state.history.length - 1];
+      return initState({ ...state, ...prev });
     default:
       return state;
   }

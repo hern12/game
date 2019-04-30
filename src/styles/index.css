@@ -92,12 +92,12 @@ body, #root {
 
 @media screen and (max-width: 480px) {
   .btn-group .btn {
-    margin: 4px;
-    font-size: 1rem;
+    margin: 6px;
+    font-size: 1.2rem;
   }
 
   .arraw-group .btn {
-    margin: 4px;
-    font-size: 1rem;
+    margin: 6px;
+    font-size: 1.2rem;
   }
 }
