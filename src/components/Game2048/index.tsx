@@ -8,17 +8,19 @@ import { utils } from 'utils';
 // import clsx from 'clsx';
 
 const COLORS = {
-  2: '#fff3e0',
-  4: '#ffcc80',
-  8: '#ffab91',
-  16: '#ff8a65',
-  32: '#e57373',
-  64: '#f44336',
-  128: '#e91e63',
-  256: '#c2185b',
-  512: '#8e24aa',
-  1024: '#c51162',
-  2048: '#aa00ff',
+  2: '#fff9c4',
+  4: '#ffe082',
+  8: '#ffb74d',
+  16: '#ffab91',
+  32: '#ef9a9a',
+  64: '#f06292',
+  128: '#ab47bc',
+  256: '#9575cd',
+  512: '#0091ea',
+  1024: '#00b8d4',
+  2048: '#00bfa5',
+  4096: '#00c853',
+  8192: '#aeea00',
   cell: '#d7ccc8',
   board: '#bcaaa4',
   title: '#0091ea',
@@ -124,7 +126,15 @@ function getBoardCells(size: number, gup:number, cellLength: number) {
 
 function getTileCells(tiles: Tile[], gup: number, cellLength: number, isLarger: boolean) {
   const fontIndex = isLarger ? 1 : 0;
-  // tiles = [{ x: 1, y: 0, value: 4 }, { x: 1, y: 1, value: 64 }, { x: 1, y: 2, value: 512, }, { x: 1, y: 3, value: 2048 }];
+  // tiles = [];
+  // let v = 2;
+  // for (let r = 0; r < 4; r++) {
+  //   for (let c = 0; c < 4; c++) {
+  //     tiles[tiles.length] = { x: c, y: r, value: v };
+  //     v *= 2;
+  //     if (v > 8192) v = 2;
+  //   }
+  // }
   return tiles.map(({ x, y, value }, i) => (
     <Rect
       key={'tile' + i}
