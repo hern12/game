@@ -1,11 +1,18 @@
 {
-  "main.css": "static/css/main.4b1528b3.css",
-  "main.css.map": "static/css/main.4b1528b3.css.map",
-  "main.js": "static/js/main.ce2ba450.js",
-  "main.js.map": "static/js/main.ce2ba450.js.map",
-  "static\\media\\iconfont.eot": "static/media/iconfont.bdadb082.eot",
-  "static\\media\\iconfont.svg": "static/media/iconfont.204d7429.svg",
-  "static\\media\\iconfont.ttf": "static/media/iconfont.686acc69.ttf",
-  "static\\media\\iconfont.woff": "static/media/iconfont.646d2bf2.woff",
-  "static\\media\\iconfont.woff2": "static/media/iconfont.c2b49401.woff2"
+  "files": {
+    "main.css": "/game/static/css/main.e94d129b.chunk.css",
+    "main.js": "/game/static/js/main.a2673276.chunk.js",
+    "main.js.map": "/game/static/js/main.a2673276.chunk.js.map",
+    "runtime~main.js": "/game/static/js/runtime~main.2d0fbc73.js",
+    "runtime~main.js.map": "/game/static/js/runtime~main.2d0fbc73.js.map",
+    "static/js/2.f23a9673.chunk.js": "/game/static/js/2.f23a9673.chunk.js",
+    "static/js/2.f23a9673.chunk.js.map": "/game/static/js/2.f23a9673.chunk.js.map",
+    "index.html": "/game/index.html",
+    "precache-manifest.2dea90374a9a55c4aadcc947af373c38.js": "/game/precache-manifest.2dea90374a9a55c4aadcc947af373c38.js",
+    "service-worker.js": "/game/service-worker.js",
+    "static/css/main.e94d129b.chunk.css.map": "/game/static/css/main.e94d129b.chunk.css.map",
+    "static/media/index.css": "/game/static/media/iconfont.c2b49401.woff2",
+    "static/media/move.mp3": "/game/static/media/move.7d5eff42.mp3",
+    "static/media/popup.mp3": "/game/static/media/popup.4af4d408.mp3"
+  }
 }
