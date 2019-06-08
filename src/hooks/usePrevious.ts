@@ -6,6 +6,6 @@ export default function usePrevious<T>(value: T) {
   useEffect(() => {
     ref.current = value;
   }, [value]);
-  
+
   return ref.current;
 }

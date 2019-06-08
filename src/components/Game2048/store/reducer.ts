@@ -10,7 +10,7 @@ import {
   ActionTypes,
   InitialState,
   State,
-  TileMove
+  TileMove,
 } from './types';
 import TileMatrix from './TileMatrix';
 import { utils } from 'utils';
@@ -112,10 +112,9 @@ function computeMoveAction(state: State, tileMove: TileMove) {
 
 export function initState({ size, gup, boardLength, score, best, tiles, history }: InitialState): State {
   const tileMatrix = new TileMatrix(size, tiles);
-  if(tiles.length === 0) {
+  if (tiles.length === 0) {
     let addCount = 2;
-    while (addCount-- > 0)
-      if (!tileMatrix.addTile()) break;
+    while (addCount-- > 0) if (!tileMatrix.addTile()) break;
     history[history.length] = { score, best, tiles: tileMatrix.tiles };
     if (history.length > HISTORY_LIMIT) history.shift();
     utils.save(LOCAL_STORAGE_KEY, history);
@@ -139,8 +138,7 @@ export function reducer(state: State, action: ActionTypes): State {
   switch (action.type) {
     case ADD_TILE:
       let addCount = action.addCount;
-      while (addCount-- > 0)
-        if (!state.tileMatrix.addTile()) break;
+      while (addCount-- > 0) if (!state.tileMatrix.addTile()) break;
       const newState = {
         ...state,
         ...computeTileMove(state.tileMatrix),

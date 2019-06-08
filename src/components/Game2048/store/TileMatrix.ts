@@ -51,28 +51,27 @@ export default class TileMatrix extends Matrix<Tile | null> {
     });
   }
 
-  private moveRowToFront(row: Array<Tile | null>, getScore: (score: number) => void): Array<Tile | null> {
-    const newRow: Array<Tile | null> = [];
-    const length = row.length;
+  private moveRowToFront(tiles: Array<Tile | null>, getScore: (score: number) => void): Array<Tile | null> {
+    const newTiles: Array<Tile | null> = [];
     let head = 0;
-    let tail = length - 1;
+    let tail = tiles.length - 1;
     let prevValue = NaN;
-    row.forEach(eachValue => {
-      if (eachValue !== null) {
-        if (prevValue === eachValue.value) {
-          getScore(eachValue.value * 2);
-          newRow[head - 1] = { ...eachValue, value: eachValue.value * 2 };
-          newRow[tail--] = null;
+    tiles.forEach(tile => {
+      if (tile !== null) {
+        if (prevValue === tile.value) {
+          getScore(tile.value * 2);
+          newTiles[head - 1] = { ...tile, value: tile.value * 2 };
+          newTiles[tail--] = null;
           prevValue = NaN;
         } else {
-          newRow[head++] = { ...eachValue };
-          prevValue = eachValue.value;
+          newTiles[head++] = { ...tile };
+          prevValue = tile.value;
         }
       } else {
-        newRow[tail--] = null;
+        newTiles[tail--] = null;
       }
     });
-    return newRow;
+    return newTiles;
   }
 
   private moveRowToBack(row: Array<Tile | null>, getScore: (score: number) => void): Array<Tile | null> {

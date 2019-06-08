@@ -21,5 +21,5 @@ export const utils = {
   load<T = any>(key: string): false | T {
     if (!window.localStorage) return false;
     return JSON.parse(window.localStorage.getItem(key)!);
-  }
+  },
 };

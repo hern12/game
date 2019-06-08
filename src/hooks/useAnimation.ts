@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import { easing, EasingNames } from 'easing';
 
 function useAnimationTimer(duration: number, delay: number) {

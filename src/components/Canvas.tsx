@@ -135,15 +135,15 @@ export interface CanvasProps extends React.CanvasHTMLAttributes<HTMLCanvasElemen
 function Canvas(props: CanvasProps) {
   const { children, canvasStyles, ...other } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const getCtx = useMemo(() => () => canvasRef.current && canvasRef.current.getContext('2d'), [canvasRef.current]);
+  const getContext2d = useMemo(() => () => canvasRef.current && canvasRef.current.getContext('2d'), []);
 
   useEffect(() => {
-    const ctx = getCtx();
+    const ctx = getContext2d();
     if (ctx) setCanvasStyles(ctx, { ...STYLES, ...canvasStyles });
-  }, [canvasStyles]);
+  }, [canvasStyles, getContext2d]);
 
   useEffect(() => {
-    const ctx = getCtx();
+    const ctx = getContext2d();
     if (ctx) {
       const w = ctx.canvas.width;
       const h = ctx.canvas.height;
@@ -188,7 +188,7 @@ export function Rect(this: CanvasRenderingContext2D, props: RectProps) {
   }
   ctx.closePath();
   ctx.fill();
-  if(styles.lineWidth) ctx.stroke();
+  if (styles.lineWidth) ctx.stroke();
   ctx.restore();
   return null;
 };

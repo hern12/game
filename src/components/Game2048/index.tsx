@@ -1,11 +1,17 @@
 import React, { useReducer, useRef, useMemo, useCallback, useEffect } from 'react';
 import Canvas, { Layout, Rect, Text } from '../Canvas';
-import { InitialState, HistoryState } from './store/types';
+import { InitialState, HistoryState, ActionTypes } from './store/types';
 import { addTile, moveLeft, moveDown, moveRight, moveUp, setBoardLength, init, undo } from './store/actions';
 import { reducer, initState, LOCAL_STORAGE_KEY } from './store/reducer';
 import { Tile } from './store/TileMatrix';
+import useEventCallback from 'hooks/useEventCallback';
 import { utils } from 'utils';
-// import clsx from 'clsx';
+
+const moveMp3 = require('../../audios/move.mp3') as string;
+const popupMp3 = require('../../audios/popup.mp3') as string;
+
+const moveAudio = new Audio(moveMp3);
+const popupAudio = new Audio(popupMp3);
 
 const COLORS = {
   2: '#fff9c4',
@@ -64,10 +70,10 @@ function getBoardLength(gup: number, width: number) {
 
 function getInitialState(): InitialState {
   const gup = 8,
-    history = utils.load<HistoryState[]>(LOCAL_STORAGE_KEY) || [];
+        history = utils.load<HistoryState[]>(LOCAL_STORAGE_KEY) || [];
   let score = 0,
-    best = 0,
-    tiles: Tile[] = [];
+      best = 0,
+      tiles: Tile[] = [];
   if (history.length) {
     const lastHistory = history[history.length - 1];
     tiles = lastHistory.tiles;
@@ -162,52 +168,60 @@ export default function Game2048() {
   const timerRef = useRef<number>();
   const isLarger = boardLength > ((MAX + MIN) / 2) - gup;
 
+  const style = useMemo(() => ({ width: boardLength }), [boardLength]);
   const scoreLayout = useMemo(() => {
-    return getScoreLayout(SCORE_HEIGHT, gup, boardLength, score, best, isLarger)
+    return getScoreLayout(SCORE_HEIGHT, gup, boardLength, score, best, isLarger);
   }, [score, best, boardLength, gup, isLarger]);
   const boardCells = useMemo(() => {
-    return getBoardCells(size, gup, cellLength)
+    return getBoardCells(size, gup, cellLength);
   }, [cellLength, gup, size]);
   const tileCells = useMemo(() => {
-    return getTileCells(tiles, gup, cellLength, isLarger)
+    return getTileCells(tiles, gup, cellLength, isLarger);
   }, [tiles, cellLength, gup, isLarger]);
 
+  const handleMove = useCallback((action: ActionTypes) => {
+    dispatch(action);
+    moveAudio.play();
+  }, []);
   const handleAddTile = useCallback(() => {
     window.clearTimeout(timerRef.current);
-    timerRef.current = window.setTimeout(() => dispatch(addTile()), 255);
-  }, [dispatch]);
-  const handleLeft = useCallback(() => {
+    timerRef.current = window.setTimeout(() => {
+      dispatch(addTile());
+      popupAudio.play();
+    }, 255);
+  }, []);
+  const handleLeft = useEventCallback(() => {
     if (!lock && left.isRemovable) {
-      dispatch(moveLeft());
+      handleMove(moveLeft());
       handleAddTile();
     }
-  }, [lock, left, dispatch]);
-  const handleDown = useCallback(() => {
+  });
+  const handleDown = useEventCallback(() => {
     if (!lock && down.isRemovable) {
-      dispatch(moveDown());
+      handleMove(moveDown());
       handleAddTile();
     }
-  }, [lock, down, dispatch]);
-  const handleRight = useCallback(() => {
+  });
+  const handleRight = useEventCallback(() => {
     if (!lock && right.isRemovable) {
-      dispatch(moveRight());
+      handleMove(moveRight());
       handleAddTile();
     }
-  }, [lock, right, dispatch]);
-  const handleUp = useCallback(() => {
+  });
+  const handleUp = useEventCallback(() => {
     if (!lock && up.isRemovable) {
-      dispatch(moveUp());
+      handleMove(moveUp());
       handleAddTile();
     }
-  }, [lock, up, dispatch]);
-  const handleUndo = useCallback(() => {
+  });
+  const handleUndo = useEventCallback(() => {
     if (!lock && history.length > 1) {
       dispatch(undo());
     }
-  }, [lock, history, dispatch]);
-  const handleNewGame = useCallback(() => {
+  });
+  const handleNewGame = useEventCallback(() => {
     dispatch(init({ size, gup, boardLength, best, score: 0, tiles: [], history }));
-  }, [best, boardLength, size, gup, dispatch]);
+  });
 
   useEffect(() => {
     const handleKeydown = (e: KeyboardEvent) => {
@@ -220,18 +234,19 @@ export default function Game2048() {
     };
     window.addEventListener('keydown', handleKeydown);
     return () => window.removeEventListener('keydown', handleKeydown);
-  }, [handleLeft, handleDown, handleRight, handleUp, dispatch]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const handleResize = () => dispatch(setBoardLength(getBoardLength(gup, window.innerWidth)));
     window.addEventListener('resize', handleResize);
-    return () => removeEventListener('resize', handleResize);
-  }, [dispatch, gup]);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [gup]);
 
-  useEffect(() => () => window.clearTimeout(timerRef.current), [])
+  useEffect(() => () => window.clearTimeout(timerRef.current), []);
 
   return (
-    <div className="center" style={{ width: boardLength }}>
+    <div className="center" style={style}>
       <Canvas width={boardLength} height={boardLength + SCORE_HEIGHT + 3 * gup}>
         <Layout>
           {scoreLayout}
@@ -254,7 +269,7 @@ export default function Game2048() {
                 textBaseline="middle"
               >
                 Game over!
-            </Rect>
+              </Rect>
             )}
           </Rect>
         </Layout>

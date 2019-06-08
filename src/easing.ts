@@ -27,7 +27,7 @@ export type EasingNames =
   | 'outCirc'
   | 'inOutCirc';
 
- export const easing: Record<EasingNames, Easing> = {
+export const easing: Record<EasingNames, Easing> = {
   // No easing, no acceleration
   linear: (t) => t,
 
@@ -106,7 +106,7 @@ export type EasingNames =
   // then quickly slows down in the middle. This tween can actually be used
   // in continuous transitions where target value changes all the time,
   // because of the very quick start, it hides the jitter between target value changes.
-  outCirc: (t) => Math.sqrt(1 - (t = t - 1) * t),
+  outCirc: (t) => Math.sqrt(1 - (t -= 1) * t),
 
   // Circular acceleration until halfway, then deceleration
   inOutCirc: (t) => {
@@ -114,5 +114,5 @@ export type EasingNames =
     if (t < 1) return -(Math.sqrt(1 - t * t) - 1) / 2;
     t -= 2;
     return (Math.sqrt(1 - t * t) + 1) / 2;
-  }
+  },
 };
